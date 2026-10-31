@@ -3,6 +3,8 @@
 All notable changes, one entry per build phase.
 
 ## [Phase 4] - 2026-10-31
+### Fixed
+- The Vite dev server binds `127.0.0.1`. Its default `localhost` bound only IPv6 `[::1]`, so IPv4-first browsers reported "page can't be reached".
 ### Added
 - `frontend/`: React 19 + Vite 8 + Tailwind 4 + React Router 7. The design tokens from the UI brief are CSS variables with a dark theme, using the Inter font. `npm run dev:express` and `dev:fastapi` pick the backend through `.env.express` and `.env.fastapi`.
 - `src/api/client.js` (axios with a Bearer token interceptor; errors become `ApiError {status, code, message}`) and `src/api/auth.js`.
