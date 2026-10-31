@@ -1,47 +1,124 @@
 # Recipe Book
 
-A multi-user recipe sharing app. Users post recipes with step-by-step instructions, browse other people's recipes by main ingredient, filter everything by veg / non-veg, save recipes to "Want to try", and review them. An admin can see and delete any recipe.
+A multi-user recipe sharing app. People post recipes with photos and step-by-step instructions, browse everyone's recipes by main ingredient (Paneer, Chicken, Egg…), filter everything by **veg / non-veg**, save recipes to **Want to try**, and review them. An admin can see every user and delete any recipe or review.
 
-It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
+It was built for a NoSQL assignment, to show MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) running behind **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie. They share one React frontend and one MongoDB, give identical responses, and read each other's documents.
 
-> Status: Phase 9 done. **Both stacks are complete.** Express and FastAPI each pass all 124 contract tests and the Playwright suite with the same React frontend; their documents, responses, and seed data are identical. Phase 10 is polish. See `tasks/todo.md` for progress.
+![Home page](docs/screenshots/home-light.jpg)
+
+| | |
+|---|---|
+| ![Recipe page](docs/screenshots/recipe.jpg) | ![Category page, dark mode](docs/screenshots/category-dark.jpg) |
+| ![Recipe form](docs/screenshots/recipe-form.jpg) | ![Admin](docs/screenshots/admin.jpg) |
 
 ## Quick start
 
-Requires Docker, Node.js 22, and Python 3.12.
+Requires **Docker**, **Node.js 22**, and **Python 3.12**.
 
 ```bash
-docker compose up -d                                                # start MongoDB 7
-docker compose ps                                                   # wait for "healthy"
-docker compose exec -T mongo mongosh recipebook /scripts/init-db.js # validators, indexes, categories (safe to re-run)
-cp .env.example .env                                                # repo root; both backends read it. Fill in JWT_SECRET and Cloudinary keys
+# 1. Database (MongoDB 7 in Docker), then schema, indexes, and the 10 categories (safe to re-run)
+docker compose up -d
+docker compose ps                                                    # wait for "healthy"
+docker compose exec -T mongo mongosh recipebook /scripts/init-db.js
+
+# 2. Config: one .env at the repo root, read by both backends
+cp .env.example .env    # set JWT_SECRET (32+ characters) and your Cloudinary keys
+
+# 3. Pick a backend, install it, and load the demo data
+cd backend-express && npm install && npm run seed && npm run dev            # API on :5000
+#   or
+cd backend-fastapi && python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt \
+  && .venv/bin/python -m scripts.seed && .venv/bin/uvicorn app.main:app --reload --port 8000   # API on :8000
+
+# 4. Frontend, pointed at the backend you started
+cd frontend && npm install && npm run dev:express    # or: npm run dev:fastapi
 ```
 
-MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; local development only). Connect MongoDB Compass to the same URL.
+Open **http://localhost:5173**. The seeded accounts all use the password `password123`: `admin@recipebook.test` (admin), `asha@recipebook.test`, `ravi@recipebook.test`, `meera@recipebook.test`, `kabir@recipebook.test`, `fatima@recipebook.test`.
+
+Notes:
+- The app is **desktop only** (at least 1280 px wide) and has light, dark, and system themes.
+- MongoDB listens on `mongodb://localhost:27017`, localhost only, with no password (local development only). MongoDB Compass connects to the same URL.
+- On Docker Desktop for Linux, the project folder must be shared (Settings → Resources → File sharing), or the `./db:/scripts` mount is refused.
+- Seed photos are hot-linked from [TheMealDB](https://www.themealdb.com), so the demo needs internet access to show them.
+- Without Cloudinary keys everything still works except real photo uploads. Set `CLOUDINARY_FAKE=1` in `.env` to use fake image URLs instead.
+
+## Switching backends
+
+Both backends implement the same 21-endpoint API (`docs/TRD.md` §6), use the same `JWT_SECRET`, and store the same documents, so you can switch at any time:
+
+1. Stop one backend and start the other (step 3 above).
+2. Restart the frontend with the matching script: `npm run dev:express` (`http://localhost:5000/api/v1`) or `npm run dev:fastapi` (`http://localhost:8000/api/v1`).
+
+Your login keeps working, because a token from either backend is valid on both. FastAPI also serves interactive API docs at `http://localhost:8000/docs`.
 
 ## Commands
 
 | Where | Command | What |
 |---|---|---|
-| root | `docker compose up -d` / `down` / `down -v` | Start / stop / stop and delete all data |
-| `backend-express/` | `npm install`, `npm run dev` | Express API on `:5000` (see [its README](backend-express/README.md)) |
-| `backend-express/` | `npm test` / `npm run test:contract` | Unit tests / contract suite against Express |
-| `backend-express/` | `npm run create-admin -- <email> <password> [name]` | Make the first admin |
-| `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews. All passwords `password123`; admin is `admin@recipebook.test`. Photos are hot-linked from [TheMealDB](https://www.themealdb.com), so the demo needs internet access |
-| `backend-fastapi/` | `python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt`, then `.venv/bin/uvicorn app.main:app --reload --port 8000` | FastAPI on `:8000`, docs at `/docs` (see [its README](backend-fastapi/README.md)) |
-| `backend-fastapi/` | `.venv/bin/python -m pytest` | FastAPI unit tests |
-| `backend-fastapi/` | `.venv/bin/python -m scripts.seed` (`--reset` to replace data) | Same demo data as the Express seed |
-| `frontend/` | `npm install`, `npm run dev:express` (or `dev:fastapi`) | React app on `:5173`, talking to that backend |
-| `frontend/` | `npm test` / `npm run build` | Component tests / production build |
-| `e2e/` | `npm install`, then `BACKEND=express npm test` (or `BACKEND=fastapi`) | Playwright smoke tests in headless Chromium. Starts the backend and Vite itself, on database `recipebook_e2e` seeded by the *other* backend's script |
-| `contract-tests/` | `npm install` then `BACKEND=express npm test` | Run the API contract suite against a backend it starts itself |
-| `contract-tests/` | `API_URL=http://localhost:5000/api/v1 npm test` | Run it against a server that is already running |
+| root | `docker compose up -d` / `down` / `down -v` | Start / stop / stop and **delete all data** |
+| `backend-express/` | `npm run dev` · `npm start` | Express API on `:5000` ([README](backend-express/README.md)) |
+| `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews |
+| `backend-express/` | `npm run create-admin -- <email> <password> [name]` | Make an admin (`/auth/register` never does) |
+| `backend-fastapi/` | `.venv/bin/uvicorn app.main:app --reload --port 8000` | FastAPI on `:8000` ([README](backend-fastapi/README.md)) |
+| `backend-fastapi/` | `.venv/bin/python -m scripts.seed` (`--reset`) | The same demo data as the Express seed |
+| `backend-fastapi/` | `.venv/bin/python -m scripts.create_admin <email> <password> [name]` | Make an admin |
+| `frontend/` | `npm run dev:express` · `npm run dev:fastapi` | React app on `:5173`, talking to that backend |
+| `frontend/` | `npm run build` | Production build into `frontend/dist` |
+
+## Testing
+
+Every suite needs the Docker MongoDB running. The test suites use their own databases (`recipebook_test`, `recipebook_e2e`), so they never touch your demo data.
+
+| Suite | Command | What it covers |
+|---|---|---|
+| Contract (API) | `cd contract-tests && npm install && BACKEND=express npm test` (or `BACKEND=fastapi`) | 124 HTTP tests covering all 21 endpoints, written once and run against either backend. It starts the backend itself. This is the parity check: both backends must pass unchanged. |
+| Express unit | `cd backend-express && npm test` | Validators, helpers, model serialisation, the image-cleanup rule, the `create-admin` script |
+| FastAPI unit | `cd backend-fastapi && .venv/bin/python -m pytest` | Security (bcrypt / JWT parity with Express), schemas, error handling, rating rounding, image cleanup, the `create_admin` script |
+| Frontend | `cd frontend && npm test` | 106 component tests: API client, auth / food-type / theme state, route guards, forms, like button, reviews, every page |
+| End-to-end | `cd e2e && npm install && npx playwright install chromium && BACKEND=express npm test` (or `fastapi`) | Headless Chromium against a real backend: guest browsing, the veg toggle, and one recipe's full life (sign up, add with a photo, edit, another user likes and reviews it, an admin deletes it). It seeds with the *other* backend's script, so it also checks cross-reading. |
+
+## What to show in a viva
+
+| MongoDB feature | Where |
+|---|---|
+| Embedded arrays | `recipes.images`, `ingredients`, `instructions[].steps` (bounded, always read with the recipe) |
+| References + `$lookup` | `reviews` and `likes` reference `recipes` and `users`; the trending, Want to try, category, and admin-user queries use `$lookup` |
+| Aggregation pipelines | Category tiles with counts, trending this week, Want to try (`$facet` paging), rating recompute, users with recipe counts (`docs/DATABASE_SCHEMA.md` §6) |
+| Text index | Search box: `$text` on `title` (weight 5) and `dishName` (weight 3) |
+| Compound indexes | `{category, foodType, createdAt}`, `{foodType, createdAt}`, `{author, createdAt}`, `{user, createdAt}` on likes, … (§5) |
+| Schema validation | A strict `$jsonSchema` on every collection, from `db/init-db.js` |
+| Unique indexes as rules | One like and one review per user per recipe; unique email |
+
+Try these in `docker compose exec mongo mongosh recipebook`:
+
+```js
+db.recipes.insertOne({ title: "x" })   // → Document failed validation
+db.recipes.find({ category: "paneer", foodType: "veg" }).sort({ createdAt: -1 }).explain("executionStats").queryPlanner.winningPlan
+//   → IXSCAN on recipes_category_foodType_createdAt
+db.recipes.find({ foodType: { $in: ["veg", "nonveg"] } }).sort({ createdAt: -1 }).explain().queryPlanner.winningPlan
+//   → SORT_MERGE of two IXSCANs: how "Both" uses an index (DATABASE_SCHEMA §6.2)
+db.recipes.find({ $text: { $search: "biryani" } }).explain().queryPlanner.winningPlan       // → TEXT_MATCH / IXSCAN on recipes_text
+db.likes.explain().aggregate([{ $match: { createdAt: { $gte: new Date(Date.now() - 7 * 864e5) } } }, { $group: { _id: "$recipe", n: { $sum: 1 } } }])
+//   → IXSCAN on likes_createdAt (trending)
+```
 
 ## Architecture
 
 ```
 React (Vite) :5173 ──► /api/v1 ──► Express :5000  OR  FastAPI :8000 ──► MongoDB 7 (Docker)
                                          └──────── Cloudinary (images) ────────┘
+```
+
+```
+db/init-db.js          collections, validators, indexes, categories (the only place indexes are made)
+backend-express/       Express 5 + Mongoose 8: routes → controllers → services → models
+backend-fastapi/       FastAPI + Beanie 2: routers → services → models, with Pydantic schemas
+frontend/              React 19 + Vite + Tailwind 4 + React Router 7
+contract-tests/        the shared API test suite
+e2e/                   Playwright end-to-end tests
+docs/                  PRD, TRD, database schema, UI/UX brief, decisions (ADRs), screenshots
+tasks/                 the phase plan and checklist this was built from
 ```
 
 | Decision | ADR |
@@ -55,13 +132,15 @@ React (Vite) :5173 ──► /api/v1 ──► Express :5000  OR  FastAPI :8000 
 | Desktop-only minimalist UI, CSS-variable tokens, dark mode | [0007](docs/decisions/0007-desktop-minimalist-ui.md) |
 | FastAPI port: Beanie 2, camelCase aliases, plain ObjectId refs | [0008](docs/decisions/0008-beanie-port.md) |
 
-Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABASE_SCHEMA.md) · [UI/UX brief](docs/UI_UX_BRIEF.md)
+Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABASE_SCHEMA.md) · [UI/UX brief](docs/UI_UX_BRIEF.md) · [Changelog](CHANGELOG.md)
 
-## Testing
+## Known limits
 
-- **Contract suite** (`contract-tests/`): HTTP tests run against either backend on the test database `recipebook_test`. It is the parity check between the two stacks.
-- **Express unit tests** (`backend-express/test/`): validators, dish-name and regex helpers, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
-- **Index check:** `explain("executionStats")` in mongosh shows `IXSCAN` for the category page, home feed (both `veg`/`nonveg` and Both via `$in`), search, trending (`likes_createdAt`), Want to try, reviews, My recipes, and `likedByMe`. See `docs/DATABASE_SCHEMA.md` §5–6.
-- **Frontend tests** (`frontend/src/**/*.test.js*`, Vitest + Testing Library): API client, contexts, route guards, auth forms, navbar, recipe card, like button (optimistic + revert), review form, Home, Category, and Recipe pages.
-- **Known limit:** photos upload as soon as they're picked. Removing one, or abandoning the form, leaves the file in Cloudinary (there is no delete-upload endpoint in the API contract).
-- **E2E** (`e2e/`, Playwright): a guest browses and gets the sign-up prompt; the veg toggle persists; one recipe's full life (sign up, add with a photo, see it in My recipes, edit, another user likes and reviews it, an admin deletes it). The first run needs `npx playwright install chromium`.
+These are deliberate, each marked in the code with a `shortcut:` comment that names when to revisit it:
+
+- **Orphaned uploads:** photos upload as soon as they're picked, so a removed photo or an abandoned form leaves its file in Cloudinary. The API contract has no delete-upload endpoint.
+- **Upload type check** trusts the declared MIME type. Cloudinary rejects non-images on real uploads; sniff file contents if uploads ever go elsewhere.
+- **Reviews** on the recipe page show the newest 50.
+- **The form's category list** is a copy of the 10 categories in `db/init-db.js`, because `GET /categories` hides empty ones.
+- **No transactions** (ADR-0003): a like plus its counter, and the delete cascade, are separate writes. A failed recipe delete can be retried.
+- **Logout is client-side** (ADR-0006): a token stays valid until it expires (7 days).

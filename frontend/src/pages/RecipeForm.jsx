@@ -110,7 +110,15 @@ export default function RecipeForm() {
   }, [focusTick]);
 
   if (existing.error) return <ErrorState error={existing.error} onRetry={existing.reload} />;
-  if (!form || !user) return null;
+  if (!form || !user) {
+    return (
+      <div role="status" aria-label={editing ? 'Loading recipe' : 'Loading'} aria-busy="true" className="mx-auto flex max-w-[760px] flex-col gap-6">
+        <div className="h-10 w-64 rounded-md bg-surface" />
+        <div className="h-32 rounded-lg bg-surface" />
+        <div className="h-64 rounded-lg bg-surface" />
+      </div>
+    );
+  }
   if (editing && existing.data.author.id !== user.id) {
     return (
       <section className="py-24 text-center">

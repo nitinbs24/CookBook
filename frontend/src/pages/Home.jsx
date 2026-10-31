@@ -70,17 +70,34 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [text, q, setParams]);
 
+  // One page-level error instead of one per section: they all fail together when the API is down.
+  const failed = categories.error || latest.error;
+  if (failed) {
+    return (
+      <ErrorState
+        error={failed}
+        onRetry={() => {
+          trending.reload();
+          categories.reload();
+          latest.reload();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-16">
       {trending.data?.length > 0 && <Trending items={trending.data} />}
 
       <section aria-labelledby="categories-heading">
         <h2 id="categories-heading" className="mb-6 text-2xl">Browse by ingredient</h2>
-        {categories.error ? (
-          <ErrorState error={categories.error} onRetry={categories.reload} />
-        ) : (
+        {categories.data ? (
           <div className="grid grid-cols-5 gap-6">
-            {categories.data?.map((c) => <CategoryTile key={c.slug} category={c} />)}
+            {categories.data.map((c) => <CategoryTile key={c.slug} category={c} />)}
+          </div>
+        ) : (
+          <div data-testid="category-skeleton" aria-busy="true" className="grid grid-cols-5 gap-6">
+            {Array.from({ length: 10 }, (_, i) => <div key={i} className="aspect-square rounded-lg bg-surface" />)}
           </div>
         )}
       </section>
@@ -100,14 +117,8 @@ export default function Home() {
             />
           </div>
         </div>
-        {latest.error ? (
-          <ErrorState error={latest.error} onRetry={latest.reload} />
-        ) : (
-          <>
-            <CardGrid items={latest.data?.items} loading={latest.loading} empty={q ? `No recipes match “${q}”.` : 'No recipes yet.'} />
-            {latest.data && <Pagination page={page} limit={LIMIT} total={latest.data.total} />}
-          </>
-        )}
+        <CardGrid items={latest.data?.items} loading={latest.loading} empty={q ? `No recipes match “${q}”.` : 'No recipes yet.'} />
+        {latest.data && <Pagination page={page} limit={LIMIT} total={latest.data.total} />}
       </section>
     </div>
   );

@@ -158,6 +158,13 @@ describe('Recipe form: edit', () => {
     expect(screen.getByRole('img', { name: 'Photo 1 (cover)' })).toHaveAttribute('src', 'https://img.test/pbm2.jpg');
   });
 
+  it('shows a placeholder while the recipe loads', async () => {
+    recipesApi.getRecipe.mockReturnValue(new Promise(() => {}));
+    renderEdit();
+
+    expect(await screen.findByRole('status', { name: 'Loading recipe' })).toBeInTheDocument();
+  });
+
   it('refuses to edit someone else’s recipe', async () => {
     recipesApi.getRecipe.mockResolvedValue(fullRecipe({ author: { id: 'someone-else', name: 'Ravi' } }));
     renderEdit();

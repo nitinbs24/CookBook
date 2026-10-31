@@ -74,6 +74,31 @@ describe('Home page', () => {
     await waitFor(() => expect(recipesApi.listRecipes).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2 })));
   });
 
+  it('shows one error with one retry when the API is down, and retrying reloads everything', async () => {
+    const { ApiError } = await import('../api/client.js');
+    const down = new ApiError(0, 'NETWORK', 'Could not reach the server');
+    recipesApi.trending.mockRejectedValue(down);
+    recipesApi.categories.mockRejectedValue(down);
+    recipesApi.listRecipes.mockRejectedValue(down);
+    const user = userEvent.setup();
+    renderHome();
+
+    expect(await screen.findAllByText('Could not reach the server')).toHaveLength(1);
+    recipesApi.categories.mockResolvedValue([{ slug: 'paneer', name: 'Paneer', imageUrl: null, recipeCount: 4 }]);
+    recipesApi.listRecipes.mockResolvedValue(page([card({ id: 'l1', title: 'Latest Dal' })]));
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByRole('link', { name: 'Latest Dal' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /paneer.*4 recipes/i })).toBeInTheDocument();
+  });
+
+  it('shows placeholder tiles while categories load', async () => {
+    recipesApi.categories.mockReturnValue(new Promise(() => {}));
+    renderHome();
+
+    expect(await screen.findByTestId('category-skeleton')).toBeInTheDocument();
+  });
+
   it('shows an empty state when nothing matches', async () => {
     recipesApi.listRecipes.mockResolvedValue(page([]));
     renderHome();
