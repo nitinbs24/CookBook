@@ -2,6 +2,23 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 4] - 2026-10-31
+### Added
+- `frontend/`: React 19 + Vite 8 + Tailwind 4 + React Router 7. The design tokens from the UI brief are CSS variables with a dark theme, using the Inter font. `npm run dev:express` and `dev:fastapi` pick the backend through `.env.express` and `.env.fastapi`.
+- `src/api/client.js` (axios with a Bearer token interceptor; errors become `ApiError {status, code, message}`) and `src/api/auth.js`.
+- Contexts:
+  - `AuthContext`: token in `rb_token` and guest flag in `rb_guest`. The user is reloaded on start; only a 401 logs out, and a network failure keeps the session.
+  - `FoodTypeContext`: `rb_foodType`, with `apiFoodType` (no param for Both).
+  - `ThemeContext`: light, dark, or system in `rb_theme`. An inline script applies it before first paint.
+- Route guards: `SessionRoute` (/home needs a token or the guest flag), `ProtectedRoute` (logged-in users, redirects to /login and back), `AdminRoute`.
+- Pages: Landing (redirects returning users), Login, Register (inline field errors with `aria-describedby`, server 409 shown on the email field), Home (a placeholder until Phase 5), and Not found. The Navbar has a radio-based veg / non-veg toggle and a theme toggle.
+- 35 component tests. ADR-0007.
+### Changed
+- From the ponytail review: the danger button text uses the `bg` token (white on dark-mode red was 2.77:1), and Register shows server field errors under the field they name.
+- Ponytail: the guest-prompt dialog, the toast, and the navbar's Add recipe / My recipes / Admin links are added with the pages that use them (Phases 5–6).
+### Verified
+- `npm run build` passes. Against the running Express API, Vite serves the app with `VITE_API_URL`, the CORS preflight from `:5173` is allowed (including `Authorization`), and register, me, and login work with seeded data. The click-through in a real browser is left to the owner (the agent's browser can't reach localhost).
+
 ## [Phase 3] - 2026-10-31
 ### Added
 - Likes: `POST`/`DELETE /recipes/:id/like`. They're idempotent: the unique index plus `$inc` only after a real insert or delete keeps the count exact, even with 5 parallel likes.

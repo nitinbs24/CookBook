@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 3 done. **The Express backend is complete** (all 21 endpoints). The frontend and FastAPI are not built yet. See `tasks/todo.md` for progress.
+> Status: Phase 4 done. The Express backend is complete. The frontend has its foundation (landing, auth, guest mode, navbar, theming); browsing and recipe pages come next. FastAPI is not built yet. See `tasks/todo.md` for progress.
 
 ## Quick start
 
@@ -28,6 +28,8 @@ MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; loc
 | `backend-express/` | `npm test` / `npm run test:contract` | Unit tests / contract suite against Express |
 | `backend-express/` | `npm run create-admin -- <email> <password> [name]` | Make the first admin |
 | `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews. All passwords `password123`; admin is `admin@recipebook.test` |
+| `frontend/` | `npm install`, `npm run dev:express` (or `dev:fastapi`) | React app on `:5173`, talking to that backend |
+| `frontend/` | `npm test` / `npm run build` | Component tests / production build |
 | `contract-tests/` | `npm install` then `BACKEND=express npm test` | Run the API contract suite against a backend it starts itself |
 | `contract-tests/` | `API_URL=http://localhost:5000/api/v1 npm test` | Run it against a server that is already running |
 
@@ -46,6 +48,7 @@ React (Vite) :5173 ──► /api/v1 ──► Express :5000  OR  FastAPI :8000 
 | Shared HTTP contract test suite | [0004](docs/decisions/0004-shared-contract-test-suite.md) |
 | Cloudinary with a test fake | [0005](docs/decisions/0005-cloudinary-with-test-fake.md) |
 | JWT with a shared secret, role from the DB | [0006](docs/decisions/0006-jwt-shared-secret.md) |
+| Desktop-only minimalist UI, CSS-variable tokens, dark mode | [0007](docs/decisions/0007-desktop-minimalist-ui.md) |
 
 Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABASE_SCHEMA.md) · [UI/UX brief](docs/UI_UX_BRIEF.md)
 
@@ -54,4 +57,5 @@ Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABA
 - **Contract suite** (`contract-tests/`): HTTP tests run against either backend on the test database `recipebook_test`. It is the parity check between the two stacks.
 - **Express unit tests** (`backend-express/test/`): validators, dish-name and regex helpers, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
 - **Index check:** `explain("executionStats")` in mongosh shows `IXSCAN` for the category page, home feed (both `veg`/`nonveg` and Both via `$in`), search, trending (`likes_createdAt`), Want to try, reviews, My recipes, and `likedByMe`. See `docs/DATABASE_SCHEMA.md` §5–6.
-- Frontend unit tests and Playwright E2E arrive with their phases.
+- **Frontend tests** (`frontend/src/**/*.test.js*`, Vitest + Testing Library): API client, auth / food-type / theme contexts, route guards, login and register forms, navbar.
+- Playwright E2E arrives in Phase 6.

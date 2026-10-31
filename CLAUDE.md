@@ -21,6 +21,8 @@ docker compose exec -T mongo mongosh recipebook /scripts/init-db.js # schema, in
 cd contract-tests && BACKEND=express npm test                       # contract suite (spawns the backend)
 cd backend-express && npm test                                      # Express unit tests
 cd backend-express && npm run dev                                   # Express API on :5000
+cd frontend && npm run dev:express                                  # React app on :5173 (dev:fastapi for the other backend)
+cd frontend && npm test && npm run build                            # frontend tests + build
 ```
 
 More commands are added to `README.md` as each package lands.
@@ -36,6 +38,7 @@ More commands are added to `README.md` as each package lands.
 - Register `/recipes/trending` before `/recipes/:id`.
 - Recipe lists send "Both" as `foodType: {$in: ["veg","nonveg"]}` so the compound indexes serve the sort (DATABASE_SCHEMA §6.2). Check new list queries with `explain()`.
 - Express controllers parse input with zod (`schema.parse(req.body)`); there's no validate middleware. Throw `httpError(status, code, message)` for API errors.
+- Frontend: colours only through the token names (`bg`, `surface`, `fg`, `muted`, `line`, `primary`, `accent`, `danger`, `veg`, `nonveg`), never raw hex. Shared classes are `@utility` in `src/index.css` (ADR-0007). API calls go through `src/api/client.js`, which throws `ApiError {status, code, message}`. Lists pass `apiFoodType` from `useFoodType()`.
 - Errors always use the shape `{ "error": { "code", "message" } }`, with the codes in TRD §6.1.
 - **Ponytail (`/ponytail:ponytail`, level full) is the house style.** Make the smallest complete change. Use, in order: the platform, then installed deps, then minimal code. Add no deps beyond TRD §3 plus the test tools without a CHANGELOG justification. No wrappers or "for later" code. Never cut validation, auth, the delete cascade, accessibility, or tests. Run `/ponytail-review` on the phase diff before each phase commit.
 - **Git:** commit directly on `main`, one commit per phase gate. No worktrees, no branches, no remote.

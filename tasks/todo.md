@@ -34,11 +34,12 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** full contract suite (124) and unit tests (22) green on Express; seed OK, counters verified; trending IXSCAN on `likes_createdAt`
 
 ## Phase 4: Frontend foundation
-- [ ] Vite + React + Tailwind tokens + dark mode; api client; Auth / FoodType / Theme contexts
-- [ ] Landing, Login, Register, guest mode, Navbar, route guards, guest prompt
-- [ ] RTL tests: contexts, guards, form errors, toggle
-- [ ] ADR-0007 (UI)
-- [ ] **Gate:** `npm test` and build green; manual auth and guest check against Express
+- [x] Vite + React + Tailwind tokens + dark mode; api client; Auth / FoodType / Theme contexts
+- [x] Landing, Login, Register, guest mode, Navbar, route guards
+- [x] RTL tests: client, contexts, guards, form errors, toggles (35)
+- [x] ADR-0007 (UI)
+- [x] **Gate:** `npm test` (35) and build green; ponytail review fixes applied; API side of the auth flow checked against Express. A browser click-through by the owner is pending.
+- Moved to Phase 5: guest prompt dialog and toast (first used by like / review)
 
 ## Phase 5: Frontend browsing and recipe page
 - [ ] Home, Category, RecipeDetail (gallery, ingredients, instructions, like, reviews, owner controls)
