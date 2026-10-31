@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 0 (foundation). The apps are not built yet. See `tasks/todo.md` for progress.
+> Status: Phase 1 done (Express auth and categories). Frontend and FastAPI are not built yet. See `tasks/todo.md` for progress.
 
 ## Quick start
 
@@ -24,6 +24,9 @@ MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; loc
 | Where | Command | What |
 |---|---|---|
 | root | `docker compose up -d` / `down` / `down -v` | Start / stop / stop and delete all data |
+| `backend-express/` | `npm install`, `npm run dev` | Express API on `:5000` (see [its README](backend-express/README.md)) |
+| `backend-express/` | `npm test` / `npm run test:contract` | Unit tests / contract suite against Express |
+| `backend-express/` | `npm run create-admin -- <email> <password> [name]` | Make the first admin |
 | `contract-tests/` | `npm install` then `BACKEND=express npm test` | Run the API contract suite against a backend it starts itself |
 | `contract-tests/` | `API_URL=http://localhost:5000/api/v1 npm test` | Run it against a server that is already running |
 
@@ -41,10 +44,12 @@ React (Vite) :5173 ──► /api/v1 ──► Express :5000  OR  FastAPI :8000 
 | Document model: embed vs reference, stored counters, no transactions | [0003](docs/decisions/0003-document-model.md) |
 | Shared HTTP contract test suite | [0004](docs/decisions/0004-shared-contract-test-suite.md) |
 | Cloudinary with a test fake | [0005](docs/decisions/0005-cloudinary-with-test-fake.md) |
+| JWT with a shared secret, role from the DB | [0006](docs/decisions/0006-jwt-shared-secret.md) |
 
 Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABASE_SCHEMA.md) · [UI/UX brief](docs/UI_UX_BRIEF.md)
 
 ## Testing
 
 - **Contract suite** (`contract-tests/`): HTTP tests run against either backend on the test database `recipebook_test`. It is the parity check between the two stacks.
-- Unit tests per package and Playwright E2E arrive with their phases.
+- **Express unit tests** (`backend-express/test/`): validators and model serialisation.
+- Frontend unit tests and Playwright E2E arrive with their phases.

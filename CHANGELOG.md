@@ -2,6 +2,17 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 1] - 2026-10-31
+### Added
+- `backend-express/`: Express 5 + Mongoose 8 app with config, User and Recipe models, an error handler that maps errors to the TRD shape, and zod validators.
+- `POST /auth/register`, `POST /auth/login`, `GET /auth/me` (bcrypt cost 12, JWT HS256 valid 7 days, role reloaded from the DB) and `GET /categories` (the §6.1 aggregation, with the `foodType` filter).
+- `npm run create-admin -- <email> <password> [name]`.
+- Contract tests: `auth` (17, including a forged-token check), `errors` (3), `categories` (5 with counts and filters). Unit tests: validators, User `toJSON` (9).
+- ADR-0006 (JWT).
+### Changed
+- From the ponytail review: the JSON body limit is 1 MB (a max-size recipe is ~150 KB), startup fails if `JWT_SECRET` is under 32 characters, and `create-admin` says when a promoted user keeps their old password.
+- Ponytail: Node's built-in `process.loadEnvFile` and `node --watch` replace `dotenv` and `nodemon`; `morgan` is skipped (nothing needs request logs yet). `optionalAuth`, `requireAdmin`, and the Review and Like models wait until a route uses them (Phases 2–3).
+
 ## [Phase 0] - 2026-10-31
 ### Added
 - UI/UX brief (`docs/UI_UX_BRIEF.md`): desktop-only minimalist design, light and dark tokens, components, and screens.

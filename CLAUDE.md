@@ -19,6 +19,8 @@ Multi-user recipe sharing app (college NoSQL assignment). One React frontend, on
 docker compose up -d                                                # MongoDB (wait for "healthy")
 docker compose exec -T mongo mongosh recipebook /scripts/init-db.js # schema, indexes, categories
 cd contract-tests && BACKEND=express npm test                       # contract suite (spawns the backend)
+cd backend-express && npm test                                      # Express unit tests
+cd backend-express && npm run dev                                   # Express API on :5000
 ```
 
 More commands are added to `README.md` as each package lands.
@@ -32,6 +34,7 @@ More commands are added to `README.md` as each package lands.
 - **No indexes in models.** Mongoose `autoIndex:false`; Beanie declares none. Change `db/init-db.js` instead.
 - **Queries live only in services.** Routes and controllers don't touch models directly.
 - Register `/recipes/trending` before `/recipes/:id`.
+- Express controllers parse input with zod (`schema.parse(req.body)`); there's no validate middleware. Throw `httpError(status, code, message)` for API errors.
 - Errors always use the shape `{ "error": { "code", "message" } }`, with the codes in TRD §6.1.
 - **Ponytail (`/ponytail:ponytail`, level full) is the house style.** Make the smallest complete change. Use, in order: the platform, then installed deps, then minimal code. Add no deps beyond TRD §3 plus the test tools without a CHANGELOG justification. No wrappers or "for later" code. Never cut validation, auth, the delete cascade, accessibility, or tests. Run `/ponytail-review` on the phase diff before each phase commit.
 - **Git:** commit directly on `main`, one commit per phase gate. No worktrees, no branches, no remote.

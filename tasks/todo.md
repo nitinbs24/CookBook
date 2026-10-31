@@ -11,13 +11,14 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** container healthy, validator rejects, harness runs and fails as expected (RED)
 
 ## Phase 1: Express foundation and auth
-- [ ] Contract tests: `errors` (unknown route, error shape), `auth` (register / login / me, 400 / 401 / 409), `categories` (empty → `[]`)
-- [ ] Unit tests: zod validators, `toJSON` transform
-- [ ] Config, db (`autoIndex:false`), five models, errorHandler, validate middleware
-- [ ] Auth service and routes, `requireAuth` / `optionalAuth` / `requireAdmin`, `create-admin` script
-- [ ] `GET /categories` aggregation (§6.1)
-- [ ] ADR-0006 (JWT)
-- [ ] **Gate:** `npm test` and contract files auth / errors / categories green
+- [x] Contract tests: `errors` (unknown route, malformed JSON, CORS), `auth` (register / login / me, 400 / 401 / 409), `categories` (empty, counts, filters)
+- [x] Unit tests: zod validators, User `toJSON` transform
+- [x] Config (root `.env` via `process.loadEnvFile`), db (`autoIndex:false`), User and Recipe models, errorHandler
+- [x] Auth service, controllers, routes, `requireAuth`, `create-admin` script
+- [x] `GET /categories` aggregation (§6.1)
+- [x] ADR-0006 (JWT)
+- [x] **Gate:** `npm test` (9) and contract suite (27) green; ponytail review findings 1–4 fixed
+- Moved to the phase that first uses them: `optionalAuth` (P2), `requireAdmin` and the Review / Like models (P3)
 
 ## Phase 2: Express recipes
 - [ ] Contract tests: `uploads`, `recipes` (CRUD, filters, search, pagination, owner checks), `trending`, `categories` counts
