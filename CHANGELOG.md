@@ -11,6 +11,7 @@ All notable changes, one entry per build phase.
 - ADR-0006 (JWT).
 ### Changed
 - From the ponytail review: the JSON body limit is 1 MB (a max-size recipe is ~150 KB), startup fails if `JWT_SECRET` is under 32 characters, and `create-admin` says when a promoted user keeps their old password.
+- `create-admin` test (`backend-express/test/createAdmin.test.js`): creates, promotes without changing the password, and rejects bad input (3 tests).
 - Ponytail: Node's built-in `process.loadEnvFile` and `node --watch` replace `dotenv` and `nodemon`; `morgan` is skipped (nothing needs request logs yet). `optionalAuth`, `requireAdmin`, and the Review and Like models wait until a route uses them (Phases 2–3).
 
 ## [Phase 0] - 2026-10-31

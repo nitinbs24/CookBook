@@ -51,5 +51,5 @@ Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABA
 ## Testing
 
 - **Contract suite** (`contract-tests/`): HTTP tests run against either backend on the test database `recipebook_test`. It is the parity check between the two stacks.
-- **Express unit tests** (`backend-express/test/`): validators and model serialisation.
+- **Express unit tests** (`backend-express/test/`): validators, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
 - Frontend unit tests and Playwright E2E arrive with their phases.
