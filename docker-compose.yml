@@ -1,0 +1,28 @@
+# Recipe Book — local MongoDB
+#
+#   docker compose up -d                                              # start
+#   docker compose ps                                                 # wait for "healthy"
+#   docker compose exec mongo mongosh recipebook /scripts/init-db.js  # validators, indexes, categories
+#
+# Apps connect with: mongodb://localhost:27017/recipebook
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: recipebook-mongo
+    ports:
+      - "127.0.0.1:27017:27017"          # reachable from this machine only
+    volumes:
+      - recipebook-mongo-data:/data/db
+      - ./db:/scripts:ro,z               # ",z" relabels for SELinux (Fedora); harmless elsewhere
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  recipebook-mongo-data:
+    name: recipebook-mongo-data
