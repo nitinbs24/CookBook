@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 1 done (Express auth and categories). Frontend and FastAPI are not built yet. See `tasks/todo.md` for progress.
+> Status: Phase 2 done (Express auth, categories, recipes, uploads, trending). Likes, reviews, admin, the frontend, and FastAPI are not built yet. See `tasks/todo.md` for progress.
 
 ## Quick start
 
@@ -51,5 +51,6 @@ Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABA
 ## Testing
 
 - **Contract suite** (`contract-tests/`): HTTP tests run against either backend on the test database `recipebook_test`. It is the parity check between the two stacks.
-- **Express unit tests** (`backend-express/test/`): validators, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
+- **Express unit tests** (`backend-express/test/`): validators, dish-name and regex helpers, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
+- **Index check:** `explain("executionStats")` in mongosh shows `IXSCAN` for the category page, home feed (both `veg`/`nonveg` and Both via `$in`), and search. See `docs/DATABASE_SCHEMA.md` §5–6.
 - Frontend unit tests and Playwright E2E arrive with their phases.

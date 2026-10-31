@@ -2,6 +2,20 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 2] - 2026-10-31
+### Added
+- `POST /uploads`: multer (memory, 5 MB, JPEG/PNG/WebP) streaming to Cloudinary `recipebook/`, or a fake URL when `CLOUDINARY_FAKE=1`.
+- `POST /recipes`, `PUT /recipes/:id` (author only), and `GET /recipes/:id` (with `likedByMe` through `optionalAuth`; a bad token counts as a guest). The server sets author, counters, and timestamps, checks the category slug exists, stores optional fields as `null`, and stores `dishName` trimmed with single spaces.
+- `GET /recipes`: cards, newest first, paginated (`limit` 1–50), filters `foodType`, `category`, and `dish` (exact, case-insensitive, regex-escaped), plus `q` text search sorted by relevance. Author names come from one batched query.
+- `GET /recipes/trending` (DATABASE_SCHEMA §6.3): cards plus `weekLikes`, with `days` and `limit`.
+- Category and Like models. Contract tests: `uploads` (7), `recipes` (28), `recipes-list` (14), `trending` (5). Unit tests: `normalizeDish`, `escapeRegex`, `recipeSchema`, list and trending queries (8).
+- Dependencies: `multer`, `cloudinary` (both in TRD §3).
+### Changed
+- Recipe lists send "Both" as `foodType: {$in: ["veg","nonveg"]}`. `explain()` showed that leaving the field out made the home feed scan the whole collection and sort in memory. The new form merges two index scans (documented in DATABASE_SCHEMA §6.2).
+- From the ponytail review: recipe images must be `https` with a `publicId` in `recipebook/`, so a later recipe delete can't destroy files outside our folder. Phase 3 will also skip images another recipe still uses.
+### Verified
+- One real upload to Cloudinary through the API (201, `res.cloudinary.com/.../recipebook/...`), then deleted.
+
 ## [Phase 1] - 2026-10-31
 ### Added
 - `backend-express/`: Express 5 + Mongoose 8 app with config, User and Recipe models, an error handler that maps errors to the TRD shape, and zod validators.

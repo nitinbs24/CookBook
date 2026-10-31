@@ -21,14 +21,15 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - Moved to the phase that first uses them: `optionalAuth` (P2), `requireAdmin` and the Review / Like models (P3)
 
 ## Phase 2: Express recipes
-- [ ] Contract tests: `uploads`, `recipes` (CRUD, filters, search, pagination, owner checks), `trending`, `categories` counts
-- [ ] Unit tests: regex escape, dishName normaliser
-- [ ] Upload service (multer, Cloudinary, fake), recipe service and routes, trending
-- [ ] **Gate:** contract files so far green; `explain()` IXSCAN on the category and search queries
+- [x] Contract tests: `uploads`, `recipes` (CRUD, owner checks, validation), `recipes-list` (filters, search, pagination), `trending`
+- [x] Unit tests: regex escape, dishName normaliser, recipe schema, list and trending queries
+- [x] Upload service (multer, Cloudinary, fake), recipe service and routes, trending, `optionalAuth`
+- [x] **Gate:** unit (20) and contract (81) green; ponytail review fixes applied; `explain()` IXSCAN for the category, home (including Both), and search queries; one real Cloudinary upload checked
 
 ## Phase 3: Express likes, reviews, me, admin, seed
 - [ ] Contract tests: `likes`, `reviews`, `me`, `admin`, delete cascade
 - [ ] Like / review / admin services and routes, cascade, rating recompute
+- [ ] Cascade deletes only Cloudinary images no other recipe references (from the Phase 2 review)
 - [ ] Seed script
 - [ ] **Gate:** full contract suite green on Express; seed OK; trending IXSCAN
 

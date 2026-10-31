@@ -51,3 +51,47 @@ export async function insertRecipes(docs) {
 export function jwtPayload(token) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
 }
+
+/** A valid POST /recipes body (no server-set fields). */
+export function recipeBody(overrides = {}) {
+  return {
+    title: 'Dhaba-style Paneer Butter Masala',
+    description: 'Smoky, buttery paneer.',
+    dishName: 'Paneer Butter Masala',
+    foodType: 'veg',
+    category: 'paneer',
+    difficulty: 'medium',
+    servings: 4,
+    prepTimeMin: 20,
+    cookTimeMin: 35,
+    images: [{ url: 'https://fake.cloudinary.test/recipebook/pbm.jpg', publicId: 'recipebook/pbm' }],
+    ingredients: [
+      { name: 'Paneer', quantity: 250, unit: 'g', note: '1-inch cubes' },
+      { name: 'Butter', quantity: 2, unit: 'tbsp' },
+    ],
+    instructions: [
+      { section: 'Gravy', steps: [{ text: 'Cook tomatoes and cashews until soft.', durationMin: 8, tip: 'Do not rush.' }] },
+      { steps: [{ text: 'Add paneer and simmer.' }] },
+    ],
+    ...overrides,
+  };
+}
+
+/** Registers a user, inserts `docs` as recipes they authored, and returns { user, token, recipes }. */
+export async function authorWithRecipes(docs = []) {
+  const author = await registerUser();
+  const authorId = new ObjectId(author.user.id);
+  const recipes = docs.map((d) => recipeDoc({ ...d, author: authorId }));
+  if (recipes.length) await insertRecipes(recipes);
+  return { ...author, recipes };
+}
+
+/** Inserts likes straight into the DB: one per entry, each from a distinct fake user. */
+export async function insertLikes(entries) {
+  const db = await testDb();
+  await db.collection('likes').insertMany(
+    entries.map(({ recipe, user = new ObjectId(), createdAt = new Date() }) => ({ user, recipe, createdAt })),
+  );
+}
+
+export const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);

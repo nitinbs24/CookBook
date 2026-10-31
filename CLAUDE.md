@@ -34,6 +34,7 @@ More commands are added to `README.md` as each package lands.
 - **No indexes in models.** Mongoose `autoIndex:false`; Beanie declares none. Change `db/init-db.js` instead.
 - **Queries live only in services.** Routes and controllers don't touch models directly.
 - Register `/recipes/trending` before `/recipes/:id`.
+- Recipe lists send "Both" as `foodType: {$in: ["veg","nonveg"]}` so the compound indexes serve the sort (DATABASE_SCHEMA §6.2). Check new list queries with `explain()`.
 - Express controllers parse input with zod (`schema.parse(req.body)`); there's no validate middleware. Throw `httpError(status, code, message)` for API errors.
 - Errors always use the shape `{ "error": { "code", "message" } }`, with the codes in TRD §6.1.
 - **Ponytail (`/ponytail:ponytail`, level full) is the house style.** Make the smallest complete change. Use, in order: the platform, then installed deps, then minimal code. Add no deps beyond TRD §3 plus the test tools without a CHANGELOG justification. No wrappers or "for later" code. Never cut validation, auth, the delete cascade, accessibility, or tests. Run `/ponytail-review` on the phase diff before each phase commit.

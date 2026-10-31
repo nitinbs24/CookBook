@@ -246,6 +246,7 @@ db.recipes.find(
 ).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit)
 ```
 
+- **Both** (no `foodType` param) is sent as `foodType: { $in: ["veg", "nonveg"] }`, not left out. Without a `foodType` condition, no index can serve the `createdAt` sort, so MongoDB scans the whole collection and sorts in memory. With `$in`, it merges two index scans in order (`SORT_MERGE`).
 - Search adds `$text: { $search: q }` and sorts by `{ score: { $meta: "textScore" } }`.
 - Author names: collect the `author` ids on the page and run one `db.users.find({ _id: { $in: ids } }, { name: 1 })`.
 - The dish filter regex is built from the escaped, trimmed `dish` param.

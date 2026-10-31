@@ -21,6 +21,8 @@ export function errorHandler(err, _req, res, _next) {
     [status, code, message] = [409, 'CONFLICT', 'Already exists'];
   } else if (err instanceof mongoose.Error.CastError) {
     [status, code, message] = [404, 'NOT_FOUND', 'Not found'];
+  } else if (err.name === 'MulterError') {
+    [status, code, message] = [400, 'VALIDATION_ERROR', err.code === 'LIMIT_FILE_SIZE' ? 'image must be 5 MB or smaller' : err.message];
   } else if (err.expose && err.status >= 400 && err.status < 500) {
     // body-parser errors: malformed JSON, body too large
     [status, code, message] = [400, 'VALIDATION_ERROR', err.message];

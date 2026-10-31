@@ -4,17 +4,27 @@ import { env } from '../config/env.js';
 import { User } from '../models/User.js';
 import { httpError } from './errorHandler.js';
 
-/** Sets `req.user` from a valid Bearer token. The role always comes from the DB, not the token. */
-export async function requireAuth(req, _res, next) {
+/** The user for a valid Bearer token, or null. The role always comes from the DB, not the token. */
+async function userFromToken(req) {
   const token = req.get('authorization')?.match(/^Bearer (.+)$/)?.[1];
   let payload;
   try {
     payload = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
   } catch {
-    throw httpError(401, 'UNAUTHENTICATED', 'Login required');
+    return null;
   }
-  const user = isValidObjectId(payload.sub) ? await User.findById(payload.sub) : null;
-  if (!user) throw httpError(401, 'UNAUTHENTICATED', 'Login required');
-  req.user = user;
+  return isValidObjectId(payload.sub) ? User.findById(payload.sub) : null;
+}
+
+/** Sets `req.user`, or responds 401. */
+export async function requireAuth(req, _res, next) {
+  req.user = await userFromToken(req);
+  if (!req.user) throw httpError(401, 'UNAUTHENTICATED', 'Login required');
+  next();
+}
+
+/** Sets `req.user` to the user or null; a missing or bad token means "guest", never an error. */
+export async function optionalAuth(req, _res, next) {
+  req.user = await userFromToken(req);
   next();
 }
