@@ -33,11 +33,12 @@ More commands are added to `README.md` as each package lands.
 - **Queries live only in services.** Routes and controllers don't touch models directly.
 - Register `/recipes/trending` before `/recipes/:id`.
 - Errors always use the shape `{ "error": { "code", "message" } }`, with the codes in TRD §6.1.
+- **Ponytail (`/ponytail:ponytail`, level full) is the house style.** Make the smallest complete change. Use, in order: the platform, then installed deps, then minimal code. Add no deps beyond TRD §3 plus the test tools without a CHANGELOG justification. No wrappers or "for later" code. Never cut validation, auth, the delete cascade, accessibility, or tests. Run `/ponytail-review` on the phase diff before each phase commit.
+- **Git:** commit directly on `main`, one commit per phase gate. No worktrees, no branches, no remote.
 - Comments explain *why*, not *what*. Deliberate limits get `// shortcut: <limit>, <when to upgrade>`.
 - Every phase updates `CHANGELOG.md`, keeps `README.md` and this file current, and writes the ADRs that phase names.
 
 ## Environment gotchas
 
-- Docker Desktop must share `/mnt/CODE` (Settings → Resources → File sharing), or the `./db:/scripts` mount is refused.
-- Files on `/mnt/CODE` show as root-owned, so each new git worktree needs a `safe.directory` entry.
+- Docker Desktop must share `/mnt/CODE` (Settings → Resources → File sharing), or the `./db:/scripts` mount is refused. (Done on this machine.)
 - Local Python is 3.14; the TRD targets 3.12. Settle this in Phase 7.

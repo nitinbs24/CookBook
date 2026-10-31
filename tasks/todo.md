@@ -5,10 +5,10 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 ## Phase 0: Foundation and harness
 - [x] UI/UX brief `docs/UI_UX_BRIEF.md` (tokens contrast-checked)
 - [x] ADRs 0001–0005, `CLAUDE.md`, README skeleton, `CHANGELOG.md`, `.gitignore`, `.env.example`, `tasks/`
-- [ ] MongoDB up and healthy; `init-db.js` applied to `recipebook` and `recipebook_test`
-- [ ] Validator rejects `db.recipes.insertOne({title:"x"})`
+- [x] MongoDB up and healthy; `init-db.js` applied to `recipebook` and `recipebook_test`
+- [x] Validator rejects `db.recipes.insertOne({title:"x"})`
 - [x] `contract-tests/` harness with the first failing test (`GET /categories` → 200 `[]`)
-- [ ] **Gate:** container healthy, validator rejects, harness runs and fails as expected (RED)
+- [x] **Gate:** container healthy, validator rejects, harness runs and fails as expected (RED)
 
 ## Phase 1: Express foundation and auth
 - [ ] Contract tests: `errors` (unknown route, error shape), `auth` (register / login / me, 400 / 401 / 409), `categories` (empty → `[]`)

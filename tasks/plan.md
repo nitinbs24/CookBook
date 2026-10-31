@@ -82,12 +82,14 @@ Other documentation:
 
 ## Phases
 
-Each phase follows the same loop: write failing tests, implement until green, refactor, then run the **phase gate**, report, and **STOP**. **Every gate also includes:** the CHANGELOG entry is written, the README and CLAUDE.md are current, the phase's ADRs are written, and new service functions have JSDoc or docstrings.
+Each phase follows the same loop: write failing tests, implement until green, refactor, then run the **phase gate**, report, and **STOP**. **Every gate also includes:** the CHANGELOG entry is written, the README and CLAUDE.md are current, the phase's ADRs are written, new service functions have JSDoc or docstrings, a `/ponytail-review` pass on the phase diff is done, and the phase is committed on `main`.
 
 ### Phase 0: Foundation and harness
 1. Write `docs/UI_UX_BRIEF.md`, `tasks/plan.md`, `tasks/todo.md`, root `.gitignore`, `.env.example` (TRD §12 names, plus `CLOUDINARY_FAKE`), `CLAUDE.md`, a README skeleton, `CHANGELOG.md`, and ADRs 0001–0005.
 2. `docker compose up -d`, run `init-db.js` on `recipebook` and `recipebook_test`, and confirm `db.recipes.insertOne({title:"x"})` is rejected.
 3. Scaffold `contract-tests/` (Vitest, `mongodb` driver, global setup as above) with one failing `GET /categories` test. This is RED until Phase 1.
+
+**Status (31 Oct):** steps 1 and 3 are done (commit `b0d412e`). Step 2 is blocked until Docker Desktop shares `/mnt/CODE` (Settings → Resources → File sharing). Remaining Phase 0 work: move to `main` (Git section), add the ponytail rule to `CLAUDE.md`, then the DB checks once the user confirms the sharing fix.
 
 **Gate:** container healthy, validator rejects the bad insert, the harness runs and reports the expected failure.
 
@@ -180,5 +182,21 @@ Each phase follows the same loop: write failing tests, implement until green, re
 | Cloudinary keys missing at demo time | Tests never need them. The real-upload manual check needs keys in `.env` before Phase 6 |
 | Flaky contract tests from shared DB state | Wipe collections before each file and run files serially (`fileParallelism: false`) |
 
-## Git
-Work in a worktree branch, commit at the end of each phase, and never push to main.
+## Git (updated: user works solo, commit on `main`)
+- From now on, work and commit directly on `main` in `/mnt/CODE/CookBook`, one commit per phase gate (plus WIP commits inside long phases). No push, because there is no remote.
+- **One-time move of the Phase 0 work onto `main`** (`main` is unborn; commit `b0d412e` is on the orphan branch `phase-0-foundation`):
+  1. The untracked `docs/PRD.md`, `TRD.md`, `DATABASE_SCHEMA.md`, `db/`, and `docker-compose.yml` in the main checkout are byte-identical to the committed copies (checked with `diff`), so `git reset --hard b0d412e` on `main` loses nothing.
+  2. `git worktree remove .claude/worktrees/phase-0-foundation`, then `git branch -D phase-0-foundation`.
+  3. Remove the `safe.directory` entry I added for the worktree path.
+  4. Add `.claude/settings.json` containing `{"worktree": {"bgIsolation": "none"}}`. The background-session guard rejects edits in the main checkout without it, and this setting is the guard's documented opt-out. Commit it.
+- Save this preference to memory: commit on `main`, no worktrees, for this project.
+
+## Ponytail (applies to every phase)
+`/ponytail:ponytail` at level **full** is the house style for all code:
+- **Smallest complete change.** Build only what the PRD, TRD, or this plan asks for. Use what already exists: the platform (`fetch`, `crypto.randomUUID`, native `<dialog>`), then installed deps, then minimal code. No wrappers, base classes, config knobs, or "for later" code. Keep the TRD layers (routes → services → models) and nothing more. The skill's priority list gives the order.
+- **Dependencies:** only what TRD §3 lists, plus the test tools (Vitest, React Testing Library, Playwright, pytest, httpx). Anything else gets a one-line justification in the CHANGELOG or isn't added. Examples: no toast library (a tiny Toast component), no form library, no state library (React context only), no `concurrently` or `start-server-and-test`.
+- **Never cut:** validation at trust boundaries (zod / Pydantic), auth and ownership checks, the delete cascade, error handling that prevents data loss, accessibility from the brief, tests.
+- **Shortcuts** with a known limit get a `// shortcut: <limit>, <when to upgrade>` comment. A `/ponytail-debt` report runs at Phase 10.
+- **Phase gates add a ponytail check:** run `/ponytail-review` on the phase diff and fix what it finds (dead code, needless abstraction, unused deps) before committing.
+- **Reports end with one or two lines:** what was skipped or not checked, and any risk.
+- This goes into `CLAUDE.md` as a rule, and Phase 0 code is re-checked against it. The harness already uses only `vitest` + `mongodb` and the platform's `fetch` / `child_process`.
