@@ -14,7 +14,7 @@ Requires Docker, Node.js 22, and (from Phase 7) Python.
 docker compose up -d                                                # start MongoDB 7
 docker compose ps                                                   # wait for "healthy"
 docker compose exec -T mongo mongosh recipebook /scripts/init-db.js # validators, indexes, categories (safe to re-run)
-cp .env.example .env                                                # then fill in the values
+cp .env.example .env                                                # repo root; both backends read it. Fill in JWT_SECRET and Cloudinary keys
 ```
 
 MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; local development only). Connect MongoDB Compass to the same URL.
