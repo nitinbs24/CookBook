@@ -4,11 +4,11 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 6 done. **The MERN stack is complete**: Express API, React frontend, and a Playwright E2E suite. Next: the FastAPI backend (Phases 7–9). See `tasks/todo.md` for progress.
+> Status: Phase 7 done. The MERN stack is complete. The FastAPI backend serves auth and categories and passes those contract tests; recipes, likes, reviews, and admin come in Phases 8–9. See `tasks/todo.md` for progress.
 
 ## Quick start
 
-Requires Docker, Node.js 22, and (from Phase 7) Python.
+Requires Docker, Node.js 22, and Python 3.12.
 
 ```bash
 docker compose up -d                                                # start MongoDB 7
@@ -28,6 +28,8 @@ MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; loc
 | `backend-express/` | `npm test` / `npm run test:contract` | Unit tests / contract suite against Express |
 | `backend-express/` | `npm run create-admin -- <email> <password> [name]` | Make the first admin |
 | `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews. All passwords `password123`; admin is `admin@recipebook.test`. Photos are hot-linked from [TheMealDB](https://www.themealdb.com), so the demo needs internet access |
+| `backend-fastapi/` | `python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt`, then `.venv/bin/uvicorn app.main:app --reload --port 8000` | FastAPI on `:8000`, docs at `/docs` (see [its README](backend-fastapi/README.md)) |
+| `backend-fastapi/` | `.venv/bin/python -m pytest` | FastAPI unit tests |
 | `frontend/` | `npm install`, `npm run dev:express` (or `dev:fastapi`) | React app on `:5173`, talking to that backend |
 | `frontend/` | `npm test` / `npm run build` | Component tests / production build |
 | `e2e/` | `npm install`, then `BACKEND=express npm test` | Playwright smoke tests in headless Chromium. Starts the backend and Vite itself, on database `recipebook_e2e` |
@@ -50,6 +52,7 @@ React (Vite) :5173 ──► /api/v1 ──► Express :5000  OR  FastAPI :8000 
 | Cloudinary with a test fake | [0005](docs/decisions/0005-cloudinary-with-test-fake.md) |
 | JWT with a shared secret, role from the DB | [0006](docs/decisions/0006-jwt-shared-secret.md) |
 | Desktop-only minimalist UI, CSS-variable tokens, dark mode | [0007](docs/decisions/0007-desktop-minimalist-ui.md) |
+| FastAPI port: Beanie 2, camelCase aliases, plain ObjectId refs | [0008](docs/decisions/0008-beanie-port.md) |
 
 Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABASE_SCHEMA.md) · [UI/UX brief](docs/UI_UX_BRIEF.md)
 

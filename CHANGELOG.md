@@ -2,6 +2,21 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 7] - 2026-10-31
+### Added
+- `backend-fastapi/` (Python 3.12, FastAPI 0.162, Beanie 2.2 on PyMongo 4.19 async):
+  - `core`: settings from the root `.env` (`JWT_SECRET` must be 32+ characters), DB init, security, and errors (422→400, 404/405→404, duplicate key→409, else 500, all in the TRD shape).
+  - Beanie `User` and `Recipe` with camelCase aliases; `CamelModel` response schemas with Express-identical dates.
+  - `get_current_user`, `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `GET /categories`, and `scripts/create_admin.py`.
+- Contract tests `auth`, `errors`, and `categories` (27) pass on FastAPI, unchanged. 20 pytest tests: security, schemas, error handling, and the `create_admin` script.
+- ADR-0008.
+### Fixed
+- A plain camelCase alias generator renamed Beanie's `id` (stored as `_id`), so users loaded from MongoDB had `id: None`. Caught by the contract suite; one shared alias function now keeps `_id`.
+- `create_admin` with no name argument passed `None` as the name. Caught by its new test.
+- From the ponytail review: unexpected errors are caught in a middleware inside CORS, so a 500 reaches the browser with CORS headers (Starlette's `Exception` handler runs outside the middleware stack). `Recipe` timestamps have no separate defaults, which would differ by microseconds; the service will set both from one clock reading. `httpx` added for FastAPI's TestClient.
+### Verified
+- Cross-backend, on one database: a FastAPI-registered user logs in on Express and the reverse, an Express token works on FastAPI `/auth/me` with an identical `createdAt` string, and stored users have identical keys (`_id, createdAt, email, name, passwordHash, role`; no `revisionId`; `$2b$12$` hashes from both).
+
 ## [Phase 6] - 2026-10-31
 ### Added
 - Recipe form (`/recipes/new`, `/recipes/:id/edit`): photos (uploaded on pick; type and 5 MB checked first; the first photo is the cover; removable), basics, ingredient rows, instruction sections with steps (add and remove, with the TRD limits), and a sticky Save. Client validation mirrors TRD §9 with errors under each field, and focus moves to the first error. Server `VALIDATION_ERROR`s land on the field their path names. Editing someone else's recipe is refused.

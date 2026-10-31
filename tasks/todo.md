@@ -55,10 +55,10 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** frontend (103), Express unit (22), contract (124), and E2E (6) green against Express; build green; screens checked by screenshot; ponytail review fixes applied
 
 ## Phase 7: FastAPI foundation and auth
-- [ ] Core, models (camelCase), schemas, deps, auth, categories, `create_admin.py`
-- [ ] pytest units; contract auth / errors / categories with `BACKEND=fastapi`
-- [ ] ADR-0008 (Beanie)
-- [ ] **Gate:** green on `:8000`; camelCase confirmed in the DB; an Express token works on FastAPI
+- [x] Core, models (camelCase, `_id` kept), schemas, deps, auth, categories, `create_admin.py`
+- [x] pytest units (20); contract auth / errors / categories with `BACKEND=fastapi` (27)
+- [x] ADR-0008 (Beanie)
+- [x] **Gate:** green on FastAPI; camelCase confirmed in the DB for users (recipes in Phase 8); an Express token works on FastAPI and users log in across backends; ponytail review fixes applied
 
 ## Phase 8: FastAPI recipes
 - [ ] Uploads, recipe CRUD, lists and filters, trending

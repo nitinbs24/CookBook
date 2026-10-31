@@ -11,7 +11,7 @@ Multi-user recipe sharing app (college NoSQL assignment). One React frontend, on
 | `backend-express/` | Express 5 + Mongoose 8 (Phase 1–3) |
 | `frontend/` | React + Vite + Tailwind (Phase 4–6) |
 | `e2e/` | Playwright smoke tests; `BACKEND=express|fastapi`; own DB `recipebook_e2e`, reseeded every run |
-| `backend-fastapi/` | FastAPI + Beanie 2 (Phase 7–9) |
+| `backend-fastapi/` | FastAPI + Beanie 2, Python 3.12 (Phase 7–9); parity rules in ADR-0008 |
 
 ## Commands
 
@@ -24,6 +24,8 @@ cd backend-express && npm run dev                                   # Express AP
 cd frontend && npm run dev:express                                  # React app on :5173 (dev:fastapi for the other backend)
 cd frontend && npm test && npm run build                            # frontend tests + build
 cd e2e && BACKEND=express npm test                                  # Playwright E2E (starts backend + Vite on 5097/5174)
+cd backend-fastapi && .venv/bin/python -m pytest                    # FastAPI unit tests
+cd contract-tests && BACKEND=fastapi npm test                       # contract suite against FastAPI
 ```
 
 More commands are added to `README.md` as each package lands.
@@ -40,6 +42,7 @@ More commands are added to `README.md` as each package lands.
 - Recipe lists send "Both" as `foodType: {$in: ["veg","nonveg"]}` so the compound indexes serve the sort (DATABASE_SCHEMA §6.2). Check new list queries with `explain()`.
 - Express controllers parse input with zod (`schema.parse(req.body)`); there's no validate middleware. Throw `httpError(status, code, message)` for API errors.
 - Frontend: colours only through the token names (`bg`, `surface`, `fg`, `muted`, `line`, `primary`, `accent`, `danger`, `veg`, `nonveg`), never raw hex. Shared classes are `@utility` in `src/index.css` (ADR-0007). API calls go through `src/api/client.js`, which throws `ApiError {status, code, message}`. Lists pass `apiFoodType` from `useFoodType()`. Load data with `useAsync(load, deps)`; dialogs are the native `<dialog>` in `components/Dialog.jsx` (render only while open); use `useToast()` for transient messages.
+- FastAPI: models use `DOCUMENT_CONFIG` (`app/models/base.py`, keeps `id` ↔ `_id`); responses are `CamelModel`s with `IsoDatetime`; never return a Document; id path params are `str`, checked in the service (malformed → 404).
 - Errors always use the shape `{ "error": { "code", "message" } }`, with the codes in TRD §6.1.
 - **Ponytail (`/ponytail:ponytail`, level full) is the house style.** Make the smallest complete change. Use, in order: the platform, then installed deps, then minimal code. Add no deps beyond TRD §3 plus the test tools without a CHANGELOG justification. No wrappers or "for later" code. Never cut validation, auth, the delete cascade, accessibility, or tests. Run `/ponytail-review` on the phase diff before each phase commit.
 - **Git:** commit directly on `main`, one commit per phase gate. No worktrees, no branches, no remote.
@@ -49,4 +52,4 @@ More commands are added to `README.md` as each package lands.
 ## Environment gotchas
 
 - Docker Desktop must share `/mnt/CODE` (Settings → Resources → File sharing), or the `./db:/scripts` mount is refused. (Done on this machine.)
-- Local Python is 3.14; the TRD targets 3.12. Settle this in Phase 7.
+- Use `python3.12` for the FastAPI venv (3.13 and 3.14 are also installed).
