@@ -10,7 +10,7 @@ Multi-user recipe sharing app (college NoSQL assignment). One React frontend, on
 | `contract-tests/` | HTTP contract suite run against either backend (ADR-0004) |
 | `backend-express/` | Express 5 + Mongoose 8 (Phase 1–3) |
 | `frontend/` | React + Vite + Tailwind (Phase 4–6) |
-| `e2e/` | Playwright smoke tests (Phase 6) |
+| `e2e/` | Playwright smoke tests; `BACKEND=express|fastapi`; own DB `recipebook_e2e`, reseeded every run |
 | `backend-fastapi/` | FastAPI + Beanie 2 (Phase 7–9) |
 
 ## Commands
@@ -23,6 +23,7 @@ cd backend-express && npm test                                      # Express un
 cd backend-express && npm run dev                                   # Express API on :5000
 cd frontend && npm run dev:express                                  # React app on :5173 (dev:fastapi for the other backend)
 cd frontend && npm test && npm run build                            # frontend tests + build
+cd e2e && BACKEND=express npm test                                  # Playwright E2E (starts backend + Vite on 5097/5174)
 ```
 
 More commands are added to `README.md` as each package lands.

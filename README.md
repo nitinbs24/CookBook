@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 5 done. The Express backend is complete. The frontend covers landing, auth, guest mode, Home (trending, categories, search), category pages, and the recipe page with likes and reviews. Next: recipe form, My recipes, Want to try, Admin, E2E. FastAPI is not built yet. See `tasks/todo.md` for progress.
+> Status: Phase 6 done. **The MERN stack is complete**: Express API, React frontend, and a Playwright E2E suite. Next: the FastAPI backend (Phases 7–9). See `tasks/todo.md` for progress.
 
 ## Quick start
 
@@ -30,6 +30,7 @@ MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; loc
 | `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews. All passwords `password123`; admin is `admin@recipebook.test`. Photos are hot-linked from [TheMealDB](https://www.themealdb.com), so the demo needs internet access |
 | `frontend/` | `npm install`, `npm run dev:express` (or `dev:fastapi`) | React app on `:5173`, talking to that backend |
 | `frontend/` | `npm test` / `npm run build` | Component tests / production build |
+| `e2e/` | `npm install`, then `BACKEND=express npm test` | Playwright smoke tests in headless Chromium. Starts the backend and Vite itself, on database `recipebook_e2e` |
 | `contract-tests/` | `npm install` then `BACKEND=express npm test` | Run the API contract suite against a backend it starts itself |
 | `contract-tests/` | `API_URL=http://localhost:5000/api/v1 npm test` | Run it against a server that is already running |
 
@@ -58,4 +59,5 @@ Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABA
 - **Express unit tests** (`backend-express/test/`): validators, dish-name and regex helpers, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
 - **Index check:** `explain("executionStats")` in mongosh shows `IXSCAN` for the category page, home feed (both `veg`/`nonveg` and Both via `$in`), search, trending (`likes_createdAt`), Want to try, reviews, My recipes, and `likedByMe`. See `docs/DATABASE_SCHEMA.md` §5–6.
 - **Frontend tests** (`frontend/src/**/*.test.js*`, Vitest + Testing Library): API client, contexts, route guards, auth forms, navbar, recipe card, like button (optimistic + revert), review form, Home, Category, and Recipe pages.
-- Playwright E2E arrives in Phase 6.
+- **Known limit:** photos upload as soon as they're picked. Removing one, or abandoning the form, leaves the file in Cloudinary (there is no delete-upload endpoint in the API contract).
+- **E2E** (`e2e/`, Playwright): a guest browses and gets the sign-up prompt; the veg toggle persists; one recipe's full life (sign up, add with a photo, see it in My recipes, edit, another user likes and reviews it, an admin deletes it). The first run needs `npx playwright install chromium`.

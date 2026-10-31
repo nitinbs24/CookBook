@@ -49,10 +49,10 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - Moved to Phase 6: Edit button on the recipe page (lands with the form)
 
 ## Phase 6: Frontend contribute, lists, admin, E2E (MERN complete)
-- [ ] RecipeForm (create / edit), delete confirm, MyRecipes, WantToTry, Admin
-- [ ] RTL tests: form rows and validation, admin tables
-- [ ] Playwright smoke suite against Express
-- [ ] **Gate:** all frontend, contract, and E2E suites green against Express
+- [x] RecipeForm (create / edit), Edit button, MyRecipes, WantToTry, Admin, navbar account menu
+- [x] RTL tests: form logic and rows, validation, uploads, my lists, admin tables, navbar menu (103 total)
+- [x] Playwright smoke suite against Express (6 tests)
+- [x] **Gate:** frontend (103), Express unit (22), contract (124), and E2E (6) green against Express; build green; screens checked by screenshot; ponytail review fixes applied
 
 ## Phase 7: FastAPI foundation and auth
 - [ ] Core, models (camelCase), schemas, deps, auth, categories, `create_admin.py`

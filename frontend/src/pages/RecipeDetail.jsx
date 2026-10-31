@@ -1,4 +1,4 @@
-import { ChefHat, Clock, Flame, Trash2, Users } from 'lucide-react';
+import { ChefHat, Clock, Flame, Pencil, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import * as recipesApi from '../api/recipes.js';
@@ -12,7 +12,7 @@ import VegMark from '../components/VegMark.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAsync } from '../hooks/useAsync.js';
-import { titleCase } from '../lib/format.js';
+import { categoryName } from '../lib/categories.js';
 
 const dateFmt = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium' });
 
@@ -71,7 +71,7 @@ export default function RecipeDetail() {
           <div className="flex items-center gap-3">
             <VegMark foodType={r.foodType} />
             <Link to={`/category/${r.category}`} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted hover:text-fg">
-              {titleCase(r.category)}
+              {categoryName(r.category)}
             </Link>
           </div>
           <div>
@@ -97,8 +97,14 @@ export default function RecipeDetail() {
           <div className="flex items-center gap-4">
             <LikeButton key={`${r.id}-${token}`} recipeId={r.id} liked={r.likedByMe} count={r.likeCount} />
             <Rating avg={r.avgRating} count={r.reviewCount} />
+            {user?.id === r.author.id && (
+              <Link to={`/recipes/${r.id}/edit`} className="btn-ghost ml-auto">
+                <Pencil size={16} strokeWidth={1.75} aria-hidden="true" />
+                Edit
+              </Link>
+            )}
             {canDelete && (
-              <button type="button" className="btn-ghost ml-auto text-danger" onClick={() => setConfirm(true)}>
+              <button type="button" className={`btn-ghost text-danger ${user?.id === r.author.id ? '' : 'ml-auto'}`} onClick={() => setConfirm(true)}>
                 <Trash2 size={16} strokeWidth={1.75} aria-hidden="true" />
                 Delete recipe
               </button>

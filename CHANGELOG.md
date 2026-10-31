@@ -2,6 +2,26 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 6] - 2026-10-31
+### Added
+- Recipe form (`/recipes/new`, `/recipes/:id/edit`): photos (uploaded on pick; type and 5 MB checked first; the first photo is the cover; removable), basics, ingredient rows, instruction sections with steps (add and remove, with the TRD limits), and a sticky Save. Client validation mirrors TRD §9 with errors under each field, and focus moves to the first error. Server `VALIDATION_ERROR`s land on the field their path names. Editing someone else's recipe is refused.
+- My recipes (`/me/recipes`) and Want to try (`/me/likes`): paginated, follow the toggle, with empty states that link to the next step.
+- Admin (`/admin`): a Recipes tab (search by title, table with author email, delete with confirmation) and a Users tab (role, recipe count, joined date; click a user to see their recipes).
+- Navbar: Add recipe, and an account menu (native `<details>`) with My recipes, Want to try, Admin (admins only), and Log out. An Edit button on the recipe page for its author.
+- `e2e/`: Playwright suite (6 tests) against a backend it starts itself, on `recipebook_e2e`, reseeded every run.
+- Component tests: 103 in total (form logic, form page, my lists, admin, navbar menu, categories).
+### Fixed
+- Logging out from a protected page (e.g. Want to try) landed on /login instead of the landing page. React Router navigates inside a transition, so the cleared token rendered first. Both now happen in one transition. Found by E2E, with a unit test added first.
+### Changed
+- From the ponytail review:
+  - orphaned uploads are documented as a `shortcut:` and in the README
+  - form errors clear when rows are added or removed
+  - Cancel goes to the recipe or to Home instead of history Back
+  - the admin table keeps its page links when a page becomes empty
+  - the account menu closes on Escape
+  - removed a no-op route `key`
+- Category names come from one list (`lib/categories.js`), so "Rice & Biryani" keeps its ampersand. The Category page no longer fetches `/categories` just to show its own name.
+
 ## [Phase 5] - 2026-10-31
 ### Added
 - Home: Trending this week (a scroll strip with buttons), category tiles with counts (hidden at 0 by the API), and latest recipes with a debounced search (`?q`) and pagination (`?page`). Every list refetches when the veg / non-veg toggle changes.

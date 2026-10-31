@@ -12,7 +12,6 @@ vi.mock('../api/recipes.js');
 beforeEach(() => {
   vi.resetAllMocks();
   localStorage.setItem('rb_guest', 'true');
-  recipesApi.categories.mockResolvedValue([{ slug: 'paneer', name: 'Paneer', imageUrl: null, recipeCount: 2 }]);
   recipesApi.listRecipes.mockResolvedValue(page([card(), card({ id: 'r2', title: 'Mom Style PBM' })]));
 });
 

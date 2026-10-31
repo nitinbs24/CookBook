@@ -5,7 +5,7 @@ import Pagination from '../components/Pagination.jsx';
 import { CardGrid, ErrorState } from '../components/States.jsx';
 import { useFoodType } from '../context/FoodTypeContext.jsx';
 import { useAsync } from '../hooks/useAsync.js';
-import { titleCase } from '../lib/format.js';
+import { categoryName } from '../lib/categories.js';
 
 const LIMIT = 12;
 
@@ -16,13 +16,11 @@ export default function Category() {
   const page = Number(params.get('page')) || 1;
   const dish = params.get('dish') || undefined;
 
-  // /categories lists only categories that have recipes; fall back to the slug for an empty one.
-  const categories = useAsync(() => recipesApi.categories({}), []);
   const recipes = useAsync(
     () => recipesApi.listRecipes({ category: slug, dish, foodType: apiFoodType, page, limit: LIMIT }),
     [slug, dish, apiFoodType, page],
   );
-  const name = categories.data?.find((c) => c.slug === slug)?.name ?? titleCase(slug);
+  const name = categoryName(slug);
 
   return (
     <section>

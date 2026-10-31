@@ -1,4 +1,5 @@
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { ChevronDown, Monitor, Moon, Plus, Sun } from 'lucide-react';
+import { startTransition, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFoodType } from '../context/FoodTypeContext.jsx';
@@ -51,9 +52,61 @@ function ThemeToggle() {
   );
 }
 
-export default function Navbar() {
-  const { token, user, logout } = useAuth();
+/** Native <details> dropdown; closes on any choice and on clicks outside. */
+function AccountMenu() {
+  const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const ref = useRef(null);
+  useEffect(() => {
+    const close = (e) => ref.current && !ref.current.contains(e.target) && (ref.current.open = false);
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, []);
+  const item = 'block rounded-md px-3 py-2 text-left text-sm hover:bg-surface';
+  return (
+    <details
+      ref={ref}
+      className="relative"
+      onKeyDown={(e) => {
+        if (e.key !== 'Escape' || !ref.current.open) return;
+        ref.current.open = false;
+        ref.current.querySelector('summary').focus();
+      }}
+    >
+      <summary className="btn-ghost list-none [&::-webkit-details-marker]:hidden">
+        {user?.name ?? 'Account'}
+        <ChevronDown size={16} strokeWidth={1.75} aria-hidden="true" />
+      </summary>
+      <div
+        className="absolute right-0 mt-2 flex w-48 flex-col rounded-lg border border-line bg-bg p-1 shadow-[0_1px_2px_rgb(0_0_0/0.06)]"
+        onClick={() => {
+          ref.current.open = false;
+        }}
+      >
+        <Link to="/me/recipes" className={item}>My recipes</Link>
+        <Link to="/me/likes" className={item}>Want to try</Link>
+        {isAdmin && <Link to="/admin" className={item}>Admin</Link>}
+        <button
+          type="button"
+          className={`${item} cursor-pointer border-t border-line text-danger`}
+          onClick={() => {
+            // React Router navigates inside a transition; clearing the token in the same transition makes
+            // both land in one render. Otherwise a protected page sees "no token" first and redirects to /login.
+            startTransition(() => {
+              navigate('/');
+              logout();
+            });
+          }}
+        >
+          Log out
+        </button>
+      </div>
+    </details>
+  );
+}
+
+export default function Navbar() {
+  const { token } = useAuth();
   return (
     <header className="sticky top-0 z-10 h-16 border-b border-line bg-surface">
       <div className="mx-auto grid h-full max-w-[1200px] grid-cols-3 items-center px-10">
@@ -67,17 +120,11 @@ export default function Navbar() {
           <ThemeToggle />
           {token ? (
             <>
-              <span className="px-2 text-sm text-muted">{user?.name}</span>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => {
-                  logout();
-                  navigate('/');
-                }}
-              >
-                Log out
-              </button>
+              <Link to="/recipes/new" className="btn-primary">
+                <Plus size={16} strokeWidth={1.75} aria-hidden="true" />
+                Add recipe
+              </Link>
+              <AccountMenu />
             </>
           ) : (
             <>
