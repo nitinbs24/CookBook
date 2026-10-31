@@ -64,6 +64,12 @@ describe('Home page', () => {
     expect(recipesApi.listRecipes).toHaveBeenLastCalledWith(expect.objectContaining({ q: undefined }));
   });
 
+  it('caps the search box at the API limit (100 characters), so a long paste cannot fail the page', async () => {
+    renderHome();
+
+    expect(await screen.findByRole('searchbox', { name: /search/i })).toHaveAttribute('maxlength', '100');
+  });
+
   it('pages through the latest recipes', async () => {
     const user = userEvent.setup();
     renderHome();

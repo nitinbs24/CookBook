@@ -1,5 +1,7 @@
 # Recipe Book — Implementation Plan (phase-gated, TDD)
 
+> **Status: complete.** All 11 phases (0–10) delivered on 31 Oct 2026; see `tasks/todo.md` and `CHANGELOG.md`.
+
 ## Context
 
 `docs/PRD.md`, `docs/TRD.md`, and `docs/DATABASE_SCHEMA.md` describe **Recipe Book**, a multi-user recipe sharing app for a college NoSQL assignment. It has one React + Vite frontend, one MongoDB 7 in Docker (`docker-compose.yml` and `db/init-db.js` already exist), and **two interchangeable backends** that serve the same 21-endpoint `/api/v1` contract: Express + Mongoose first, then FastAPI + Beanie.
@@ -88,8 +90,6 @@ Each phase follows the same loop: write failing tests, implement until green, re
 1. Write `docs/UI_UX_BRIEF.md`, `tasks/plan.md`, `tasks/todo.md`, root `.gitignore`, `.env.example` (TRD §12 names, plus `CLOUDINARY_FAKE`), `CLAUDE.md`, a README skeleton, `CHANGELOG.md`, and ADRs 0001–0005.
 2. `docker compose up -d`, run `init-db.js` on `recipebook` and `recipebook_test`, and confirm `db.recipes.insertOne({title:"x"})` is rejected.
 3. Scaffold `contract-tests/` (Vitest, `mongodb` driver, global setup as above) with one failing `GET /categories` test. This is RED until Phase 1.
-
-**Status (31 Oct):** steps 1 and 3 are done (commit `b0d412e`). Step 2 is blocked until Docker Desktop shares `/mnt/CODE` (Settings → Resources → File sharing). Remaining Phase 0 work: move to `main` (Git section), add the ponytail rule to `CLAUDE.md`, then the DB checks once the user confirms the sharing fix.
 
 **Gate:** container healthy, validator rejects the bad insert, the harness runs and reports the expected failure.
 

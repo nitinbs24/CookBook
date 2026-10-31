@@ -110,6 +110,7 @@ export default function Home() {
             <input
               type="search"
               aria-label="Search recipes"
+              maxLength={100} // the API rejects longer q with 400, which would replace the whole page
               placeholder="Search by title or dish"
               value={text}
               onChange={(e) => setText(e.target.value)}

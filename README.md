@@ -24,13 +24,13 @@ docker compose exec -T mongo mongosh recipebook /scripts/init-db.js
 # 2. Config: one .env at the repo root, read by both backends
 cp .env.example .env    # set JWT_SECRET (32+ characters) and your Cloudinary keys
 
-# 3. Pick a backend, install it, and load the demo data
+# 3. Pick a backend, install it, load the demo data, and start it (it keeps running in this terminal)
 cd backend-express && npm install && npm run seed && npm run dev            # API on :5000
 #   or
 cd backend-fastapi && python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt \
   && .venv/bin/python -m scripts.seed && .venv/bin/uvicorn app.main:app --reload --port 8000   # API on :8000
 
-# 4. Frontend, pointed at the backend you started
+# 4. In a second terminal, from the repo root: the frontend, pointed at the backend you started
 cd frontend && npm install && npm run dev:express    # or: npm run dev:fastapi
 ```
 
@@ -68,14 +68,14 @@ Your login keeps working, because a token from either backend is valid on both. 
 
 ## Testing
 
-Every suite needs the Docker MongoDB running. The test suites use their own databases (`recipebook_test`, `recipebook_e2e`), so they never touch your demo data.
+Every suite needs the Docker MongoDB running. The test suites use their own databases (`recipebook_test`, `recipebook_e2e`), so they never touch your demo data. **Run one suite at a time:** the contract suite and the backend unit tests share `recipebook_test` and fixed test ports, so overlapping runs interfere with each other.
 
 | Suite | Command | What it covers |
 |---|---|---|
 | Contract (API) | `cd contract-tests && npm install && BACKEND=express npm test` (or `BACKEND=fastapi`) | 124 HTTP tests covering all 21 endpoints, written once and run against either backend. It starts the backend itself. This is the parity check: both backends must pass unchanged. |
 | Express unit | `cd backend-express && npm test` | Validators, helpers, model serialisation, the image-cleanup rule, the `create-admin` script |
 | FastAPI unit | `cd backend-fastapi && .venv/bin/python -m pytest` | Security (bcrypt / JWT parity with Express), schemas, error handling, rating rounding, image cleanup, the `create_admin` script |
-| Frontend | `cd frontend && npm test` | 106 component tests: API client, auth / food-type / theme state, route guards, forms, like button, reviews, every page |
+| Frontend | `cd frontend && npm test` | 107 component tests: API client, auth / food-type / theme state, route guards, forms, like button, reviews, every page |
 | End-to-end | `cd e2e && npm install && npx playwright install chromium && BACKEND=express npm test` (or `fastapi`) | Headless Chromium against a real backend: guest browsing, the veg toggle, and one recipe's full life (sign up, add with a photo, edit, another user likes and reviews it, an admin deletes it). It seeds with the *other* backend's script, so it also checks cross-reading. |
 
 ## What to show in a viva

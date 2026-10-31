@@ -70,5 +70,7 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** full contract suite green on both backends (124/124 each); Playwright 6/6 on both, each seeded by the other backend's script; seeds compared and identical; ponytail review fixes applied
 
 ## Phase 10: Polish
-- [ ] Loading, empty, and error states; final README; screenshots
-- [ ] **Gate:** fresh-clone dry run following the README, every suite green
+- [x] Loading, empty, and error states checked in a browser (single page-level error on Home, tile and form skeletons); final README; screenshots
+- [x] `/ponytail-debt`: 5 shortcuts, all with triggers, listed in README Known limits
+- [x] **Gate:** fresh-clone dry run following the README, every suite green on both backends; ponytail review fixes applied
+- [ ] Owner action: re-enter the three Cloudinary values in the root `.env` (lost in the Phase 10 incident; see CHANGELOG)

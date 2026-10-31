@@ -2,6 +2,21 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 10] - 2026-10-31
+### Added
+- Final README: what the app is, screenshots (`docs/screenshots/`), quick start for both stacks, switching backends, a commands table, every test suite, a "what to show in a viva" section with `explain()` commands (checked to give the output it describes), architecture, ADR index, and known limits.
+- Home and recipe-form loading placeholders (category tile skeletons; a labelled form skeleton while a recipe loads for editing).
+### Changed
+- Home shows one page-level error with one Try again (which reloads every section) when the API is down, instead of an error box per section.
+- README and `CLAUDE.md`: run test suites one at a time (they share `recipebook_test` and test ports).
+- From the ponytail review: the Home search box is capped at 100 characters (the API's limit), so a long paste can't turn the page into an error with no search box. The Quick start says the frontend runs in a second terminal from the repo root.
+### Verified
+- Error and empty states were triggered in headless Chromium: API down, an empty category under a filter, and a search with no results.
+- `/ponytail-debt`: 5 `shortcut:` markers, all with a named limit and upgrade trigger. They're listed in the README's Known limits.
+- Fresh-clone dry run following the README, in a scratch folder and database: both seeds (the Python one refuses a non-empty DB without `--reset`), both APIs, FastAPI `/docs`, frontend build, frontend tests (106; 107 after the review fix), Express unit (22), pytest (51), contract on both backends (124/124 each), and Playwright on both (6/6 each).
+### Incident
+- A first dry-run attempt failed at `git clone` (git's safe.directory check), and the unguarded command chain kept running in the real project. It overwrote the root `.env` with `.env.example`. The non-secret values were restored, but **the Cloudinary keys were lost and must be re-entered**. The dry run was redone under `set -euo pipefail` with absolute paths. Nothing tracked by git was affected.
+
 ## [Phase 9] - 2026-10-31
 ### Added
 - FastAPI:
