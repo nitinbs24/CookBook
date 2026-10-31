@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.db import init_db
 from app.core.errors import register_error_handlers
-from app.routers import auth, categories, recipes, uploads
+from app.routers import admin, auth, categories, likes, me, recipes, reviews, uploads
 
 
 @asynccontextmanager
@@ -26,4 +26,8 @@ api.include_router(auth.router)
 api.include_router(categories.router)
 api.include_router(recipes.router)
 api.include_router(uploads.router)
+api.include_router(likes.router)
+api.include_router(reviews.router)
+api.include_router(me.router)
+api.include_router(admin.router)
 app.include_router(api)

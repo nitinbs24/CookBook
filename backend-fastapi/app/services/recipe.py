@@ -6,9 +6,11 @@ from bson import ObjectId
 from app.core.errors import ApiError
 from app.models.like import Like
 from app.models.recipe import Recipe
+from app.models.review import Review
 from app.models.user import User
 from app.schemas.common import Page
 from app.schemas.recipe import CardOut, RecipeDetailOut, RecipeIn, RecipeOut, TrendingCardOut
+from app.services.upload import delete_images
 
 CARD_PROJECTION = {
     "title": 1, "dishName": 1, "images": {"$slice": 1}, "foodType": 1, "category": 1,
@@ -29,27 +31,29 @@ def object_id(value: str, what: str = "Recipe") -> ObjectId:
 
 
 async def _users(ids) -> dict[str, dict]:
-    users = await User.get_pymongo_collection().find({"_id": {"$in": list(set(ids))}}, {"name": 1}).to_list()
+    users = await User.get_pymongo_collection().find({"_id": {"$in": list(set(ids))}}, {"name": 1, "email": 1}).to_list()
     return {str(u["_id"]): u for u in users}
 
 
-async def to_cards(recipes: list[dict], model=CardOut) -> list:
+async def to_cards(recipes: list[dict], model=CardOut, with_email: bool = False) -> list:
     """Raw recipe docs → API cards, with author names from one batched query (DATABASE_SCHEMA §6.2)."""
     users = await _users(r["author"] for r in recipes)
     cards = []
     for r in recipes:
         u = users.get(str(r["author"]), {})
         author = {"id": str(r["author"]), "name": u.get("name")}
+        if with_email:  # admin views (AdminCardOut)
+            author["email"] = u.get("email")
         cards.append(model.model_validate({**r, "id": str(r["_id"]), "image": r["images"][0], "author": author}))
     return cards
 
 
-async def card_page(filter_: dict, page: int, limit: int, *, sort=None, projection=None) -> Page:
+async def card_page(filter_: dict, page: int, limit: int, *, sort=None, projection=None, model=CardOut, with_email=False) -> Page:
     """One page of recipe cards, newest first unless `sort` says otherwise."""
     coll = Recipe.get_pymongo_collection()
     cursor = coll.find(filter_, projection or CARD_PROJECTION).sort(sort or [("createdAt", -1)]).skip((page - 1) * limit).limit(limit)
     docs, total = await cursor.to_list(), await coll.count_documents(filter_)
-    return Page(items=await to_cards(docs), page=page, limit=limit, total=total)
+    return Page(items=await to_cards(docs, model, with_email), page=page, limit=limit, total=total)
 
 
 def text_search(filter_: dict, q: str | None) -> dict:
@@ -135,3 +139,36 @@ async def trending_recipes(*, food_type, days, limit) -> list[TrendingCardOut]:
         ]
     ).to_list()
     return await to_cards(rows, TrendingCardOut)
+
+
+async def unused_public_ids(public_ids: list[str]) -> list[str]:
+    """The given Cloudinary ids that no recipe references any more."""
+    if not public_ids:
+        return []
+    still_used = set(await Recipe.get_pymongo_collection().distinct("images.publicId", {"images.publicId": {"$in": public_ids}}))
+    return [pid for pid in public_ids if pid not in still_used]
+
+
+async def delete_recipe(recipe_id: str, user: User) -> None:
+    """Deletes a recipe with its reviews, likes, and unshared images (DATABASE_SCHEMA §6.8). 404 / 403.
+    Not atomic (ADR-0003). The recipe goes last, so a failure part-way leaves it visible with stale
+    counters, and deleting it again finishes the job."""
+    coll = Recipe.get_pymongo_collection()
+    recipe = await coll.find_one({"_id": object_id(recipe_id)}, {"author": 1, "images": 1})
+    if recipe is None:
+        raise ApiError(404, "NOT_FOUND", "Recipe not found")
+    if recipe["author"] != user.id and user.role != "admin":
+        raise ApiError(403, "FORBIDDEN", "Only the author or an admin can delete this recipe")
+    await Review.get_pymongo_collection().delete_many({"recipe": recipe["_id"]})
+    await Like.get_pymongo_collection().delete_many({"recipe": recipe["_id"]})
+    await coll.delete_one({"_id": recipe["_id"]})
+    # Another recipe may point at the same image; only delete images nobody uses now.
+    await delete_images(await unused_public_ids([img["publicId"] for img in recipe["images"]]))
+
+
+async def my_recipes(user: User, *, food_type, page, limit) -> Page:
+    """The user's own recipes, newest first (uses the {author, createdAt} index)."""
+    filter_: dict = {"author": user.id}
+    if food_type:
+        filter_["foodType"] = food_type
+    return await card_page(filter_, page, limit)

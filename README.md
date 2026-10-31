@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 8 done. The MERN stack is complete. The FastAPI backend serves auth, categories, uploads, recipes (create / read / edit, lists, search, trending) and passes those contract tests (84 of 124); likes, reviews, my lists, admin, and delete come in Phase 9. See `tasks/todo.md` for progress.
+> Status: Phase 9 done. **Both stacks are complete.** Express and FastAPI each pass all 124 contract tests and the Playwright suite with the same React frontend; their documents, responses, and seed data are identical. Phase 10 is polish. See `tasks/todo.md` for progress.
 
 ## Quick start
 
@@ -30,9 +30,10 @@ MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; loc
 | `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews. All passwords `password123`; admin is `admin@recipebook.test`. Photos are hot-linked from [TheMealDB](https://www.themealdb.com), so the demo needs internet access |
 | `backend-fastapi/` | `python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt`, then `.venv/bin/uvicorn app.main:app --reload --port 8000` | FastAPI on `:8000`, docs at `/docs` (see [its README](backend-fastapi/README.md)) |
 | `backend-fastapi/` | `.venv/bin/python -m pytest` | FastAPI unit tests |
+| `backend-fastapi/` | `.venv/bin/python -m scripts.seed` (`--reset` to replace data) | Same demo data as the Express seed |
 | `frontend/` | `npm install`, `npm run dev:express` (or `dev:fastapi`) | React app on `:5173`, talking to that backend |
 | `frontend/` | `npm test` / `npm run build` | Component tests / production build |
-| `e2e/` | `npm install`, then `BACKEND=express npm test` | Playwright smoke tests in headless Chromium. Starts the backend and Vite itself, on database `recipebook_e2e` |
+| `e2e/` | `npm install`, then `BACKEND=express npm test` (or `BACKEND=fastapi`) | Playwright smoke tests in headless Chromium. Starts the backend and Vite itself, on database `recipebook_e2e` seeded by the *other* backend's script |
 | `contract-tests/` | `npm install` then `BACKEND=express npm test` | Run the API contract suite against a backend it starts itself |
 | `contract-tests/` | `API_URL=http://localhost:5000/api/v1 npm test` | Run it against a server that is already running |
 

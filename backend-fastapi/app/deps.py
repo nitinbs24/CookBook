@@ -2,7 +2,7 @@ import re
 
 from beanie import PydanticObjectId
 from bson import ObjectId
-from fastapi import Header
+from fastapi import Depends, Header
 
 from app.core.errors import ApiError
 from app.core.security import decode_token
@@ -28,4 +28,11 @@ async def get_current_user(authorization: str | None = Header(default=None)) -> 
     user = await _user_from_header(authorization)
     if user is None:
         raise ApiError(401, "UNAUTHENTICATED", "Login required")
+    return user
+
+
+async def require_admin(user: User = Depends(get_current_user)) -> User:
+    """401 without a login, 403 for non-admins. The API enforces this; the UI only hides the page."""
+    if user.role != "admin":
+        raise ApiError(403, "FORBIDDEN", "Admins only")
     return user

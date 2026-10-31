@@ -2,6 +2,25 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 9] - 2026-10-31
+### Added
+- FastAPI:
+  - likes: idempotent, with `$inc` only after a real insert or delete
+  - `GET /me/likes` and `GET /me/recipes`
+  - reviews: list, create (403 on your own recipe, 409 on a duplicate), and delete (reviewer or admin), with the rating recomputed
+  - `DELETE /recipes/{id}`: reviews, then likes, then the recipe, then unshared Cloudinary images
+  - admin endpoints behind `require_admin`
+  - `Review` document; review, like, and admin schemas
+- `scripts/seed.py`, a port of `seed.js` that writes identical data.
+- 13 pytest tests (51 in total): review schema, rating rounding, unshared-image cleanup.
+- E2E global setup seeds with the other backend's script, so every E2E run is also a cross-read check. If that backend isn't set up, it falls back to the same backend's seed and prints a warning (from the ponytail review, so a MERN-only checkout can still run E2E). The shared list query params live in `app/routers/params.py`.
+### Fixed
+- Rating rounding parity: Python's `round()` rounds halves to even, so a 4.25 average would show 4.2 on FastAPI and 4.3 on Express. `round_rating` rounds halves up, like `Math.round`.
+### Verified
+- The full contract suite passes 124/124 on **both** backends.
+- Playwright passes 6/6 on both: Python-seeded data browsed through Express, and Express-seeded data browsed through FastAPI.
+- `seed.js` and `seed.py`, run into two scratch databases, give identical users, recipes (authors, counters, ratings, photos, content), likes, and reviews. `seed.js`'s random generator overflows JS's exact-integer range, so `seed.py` reproduces it with float arithmetic.
+
 ## [Phase 8] - 2026-10-31
 ### Added
 - FastAPI recipes, ported from the Express services:

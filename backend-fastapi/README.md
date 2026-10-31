@@ -9,5 +9,6 @@ FastAPI + Beanie 2 (on PyMongo's async client), Python 3.12. Serves the same `/a
 | `.venv/bin/python -m pytest` | Unit tests (`test_create_admin.py` needs Docker MongoDB) |
 | `cd ../contract-tests && BACKEND=fastapi npm test` | Contract suite against this backend (starts it on `:8099` with `recipebook_test`) |
 | `.venv/bin/python -m scripts.create_admin <email> <password> [name]` | Promote a user to admin, or create a new admin |
+| `.venv/bin/python -m scripts.seed` | Demo data into an empty DB (`--reset` replaces users, recipes, reviews, likes). Same data as the Express seed |
 
 Layout: `app/routers` → `app/services` (all DB queries) → `app/models` (Beanie Documents). Request and response shapes live in `app/schemas` (camelCase on the wire). Errors go through `app/core/errors.py`. See ADR-0008 for the parity rules.

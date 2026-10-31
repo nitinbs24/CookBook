@@ -66,8 +66,8 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** contract recipes / uploads / trending / categories / recipes-list green on FastAPI (59); cross-backend response and stored-document parity verified; real upload checked; ponytail review fixes applied
 
 ## Phase 9: FastAPI likes, reviews, me, admin, seed (Python complete)
-- [ ] Remaining endpoints, cascade, `seed.py`
-- [ ] **Gate:** full contract suite green on both backends; Playwright with `dev:fastapi`; cross-read check
+- [x] Remaining endpoints, cascade, `seed.py` (identical data to `seed.js`)
+- [x] **Gate:** full contract suite green on both backends (124/124 each); Playwright 6/6 on both, each seeded by the other backend's script; seeds compared and identical; ponytail review fixes applied
 
 ## Phase 10: Polish
 - [ ] Loading, empty, and error states; final README; screenshots

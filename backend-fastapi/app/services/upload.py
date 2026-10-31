@@ -1,3 +1,5 @@
+import asyncio
+import logging
 import uuid
 
 import cloudinary
@@ -5,6 +7,8 @@ import cloudinary.uploader
 from starlette.concurrency import run_in_threadpool
 
 from app.core.config import settings
+
+log = logging.getLogger("recipebook")
 
 cloudinary.config(
     cloud_name=settings.cloudinary_cloud_name,
@@ -22,3 +26,16 @@ async def upload_image(data: bytes) -> dict:
     # The Cloudinary SDK is synchronous; keep it off the event loop.
     result = await run_in_threadpool(cloudinary.uploader.upload, data, folder="recipebook", resource_type="image")
     return {"url": result["secure_url"], "publicId": result["public_id"]}
+
+
+async def delete_images(public_ids: list[str]) -> None:
+    """Deletes images from Cloudinary. Failures are logged, not raised: the recipe is already gone,
+    so an orphaned image is the worst case (ADR-0005). No-op with CLOUDINARY_FAKE=1."""
+    if settings.cloudinary_fake or not public_ids:
+        return
+    results = await asyncio.gather(
+        *(run_in_threadpool(cloudinary.uploader.destroy, pid) for pid in public_ids), return_exceptions=True
+    )
+    for pid, result in zip(public_ids, results, strict=True):
+        if isinstance(result, Exception):
+            log.error("Cloudinary delete failed for %s: %s", pid, result)

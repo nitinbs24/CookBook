@@ -1,18 +1,15 @@
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
 from app.deps import get_current_user, get_optional_user
 from app.models.user import User
+from app.routers.params import FoodType, Limit, PageNo
 from app.schemas.common import Page
 from app.schemas.recipe import CardOut, RecipeDetailOut, RecipeIn, RecipeOut, TrendingCardOut
 from app.services import recipe as recipe_service
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
-
-FoodType = Annotated[Literal["veg", "nonveg"] | None, Query(alias="foodType")]
-PageNo = Annotated[int, Query(ge=1)]
-Limit = Annotated[int, Query(ge=1, le=50)]
 
 
 @router.get("", response_model=Page[CardOut])
@@ -46,3 +43,8 @@ async def create_recipe(body: RecipeIn, user: User = Depends(get_current_user)):
 @router.put("/{recipe_id}", response_model=RecipeOut)
 async def update_recipe(recipe_id: str, body: RecipeIn, user: User = Depends(get_current_user)):
     return await recipe_service.update_recipe(recipe_id, body, user)
+
+
+@router.delete("/{recipe_id}", status_code=204)
+async def delete_recipe(recipe_id: str, user: User = Depends(get_current_user)):
+    await recipe_service.delete_recipe(recipe_id, user)
