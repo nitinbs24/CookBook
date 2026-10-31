@@ -35,5 +35,5 @@ A recipe page shows the photos, ingredients, sectioned steps, rating, like count
 
 ## Consequences
 - A crash between the like insert and the `$inc` can leave `likeCount` off by one. This is accepted at this scale. A count can be repaired by hand by recounting the `likes` collection for that recipe; there is no automatic repair.
-- The delete cascade (reviews, then likes, then the recipe, then the images) is not atomic. A partial failure leaves orphaned reviews or likes that point at a missing recipe; lists use `$lookup` + `$unwind`, so orphans are skipped.
+- The delete cascade (reviews, then likes, then the recipe, then the images) is not atomic. The recipe is deleted last on purpose: a failure part-way leaves the recipe visible with stale counters, and deleting it again finishes the job. (Deleting the recipe first would leave orphaned reviews or likes that nothing could clean up.) A failed Cloudinary delete only orphans the image (ADR-0005).
 - `dishName` is stored trimmed with single spaces, so the case-insensitive dish filter matches exactly.

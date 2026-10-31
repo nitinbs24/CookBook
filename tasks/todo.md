@@ -27,11 +27,11 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** unit (20) and contract (81) green; ponytail review fixes applied; `explain()` IXSCAN for the category, home (including Both), and search queries; one real Cloudinary upload checked
 
 ## Phase 3: Express likes, reviews, me, admin, seed
-- [ ] Contract tests: `likes`, `reviews`, `me`, `admin`, delete cascade
-- [ ] Like / review / admin services and routes, cascade, rating recompute
-- [ ] Cascade deletes only Cloudinary images no other recipe references (from the Phase 2 review)
-- [ ] Seed script
-- [ ] **Gate:** full contract suite green on Express; seed OK; trending IXSCAN
+- [x] Contract tests: `likes`, `reviews`, `me`, `admin`, `recipes-delete` (cascade)
+- [x] Like / review / admin services and routes, cascade, rating recompute, `requireAdmin`
+- [x] Cascade deletes only Cloudinary images no other recipe references (from the Phase 2 review)
+- [x] Seed script
+- [x] **Gate:** full contract suite (124) and unit tests (22) green on Express; seed OK, counters verified; trending IXSCAN on `likes_createdAt`
 
 ## Phase 4: Frontend foundation
 - [ ] Vite + React + Tailwind tokens + dark mode; api client; Auth / FoodType / Theme contexts

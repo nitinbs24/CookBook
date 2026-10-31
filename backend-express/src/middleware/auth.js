@@ -28,3 +28,9 @@ export async function optionalAuth(req, _res, next) {
   req.user = await userFromToken(req);
   next();
 }
+
+/** Use after requireAuth. Admin rights come from the DB role loaded by requireAuth. */
+export function requireAdmin(req, _res, next) {
+  if (req.user.role !== 'admin') throw httpError(403, 'FORBIDDEN', 'Admins only');
+  next();
+}

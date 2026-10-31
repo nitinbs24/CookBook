@@ -174,7 +174,7 @@ Card = `{ id, title, dishName, image, foodType, category, avgRating, reviewCount
 | POST | `/recipes/:id/like` | user | → 200 `{ liked: true, likeCount }` (liking twice changes nothing) |
 | DELETE | `/recipes/:id/like` | user | → 200 `{ liked: false, likeCount }` |
 | GET | `/me/likes` | user | `?foodType&page&limit` → 200 page of cards, newest like first |
-| GET | `/me/recipes` | user | `?page&limit` → 200 page of cards |
+| GET | `/me/recipes` | user | `?foodType&page&limit` → 200 page of cards, newest first (`foodType` per PRD F-11) |
 
 **Admin**
 

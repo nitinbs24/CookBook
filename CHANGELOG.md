@@ -2,6 +2,22 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 3] - 2026-10-31
+### Added
+- Likes: `POST`/`DELETE /recipes/:id/like`. They're idempotent: the unique index plus `$inc` only after a real insert or delete keeps the count exact, even with 5 parallel likes.
+- `GET /me/likes` (Want to try, newest like first, `foodType`) and `GET /me/recipes` (`foodType` added per PRD F-11).
+- Reviews: list, create (403 on your own recipe, 409 on a duplicate), and delete by the reviewer or an admin. `avgRating` (1 decimal) and `reviewCount` are recomputed after each change.
+- `DELETE /recipes/:id` (author or admin) deletes the recipe's reviews, then its likes, then the recipe, then any Cloudinary images no other recipe references.
+- Admin: `GET /admin/recipes` (with `author.email` and `q`), `/admin/users` (with `recipeCount`), and `/admin/users/:id/recipes`, all behind `requireAdmin`.
+- `npm run seed`: 6 users, 30 recipes, 100 likes, 50 reviews, using the API's own counter helpers. It refuses to touch a non-empty DB without `--reset`.
+- Contract tests: `likes` (6), `me` (7), `reviews` (17), `recipes-delete` (4), `admin` (9); 124 in total. Unit test: `unusedPublicIds` (2).
+### Changed
+- The recipe service's `cardPage()` now builds every recipe-card list (home, category, search, My recipes, admin).
+- TRD §6.2: `/me/recipes` accepts `foodType`.
+- From the ponytail review: ADR-0003 and `deleteRecipe` now describe the real partial-failure outcome (stale counters, fixed by deleting again), and the seed prints which database it writes to.
+### Verified
+- `explain()` shows IXSCAN on the seeded data for trending (`likes_createdAt`), Want to try, the review list, My recipes, the admin recipe count, and `likedByMe`.
+
 ## [Phase 2] - 2026-10-31
 ### Added
 - `POST /uploads`: multer (memory, 5 MB, JPEG/PNG/WebP) streaming to Cloudinary `recipebook/`, or a fake URL when `CLOUDINARY_FAKE=1`.

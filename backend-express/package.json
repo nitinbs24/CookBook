@@ -10,7 +10,8 @@
     "start": "node src/server.js",
     "test": "vitest run",
     "test:contract": "npm --prefix ../contract-tests test",
-    "create-admin": "node scripts/createAdmin.js"
+    "create-admin": "node scripts/createAdmin.js",
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

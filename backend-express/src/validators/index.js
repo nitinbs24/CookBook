@@ -66,18 +66,28 @@ export const recipeSchema = z.object({
     .max(8),
 });
 
-const page = z.coerce.number().int().min(1).default(1);
 const limit = (dflt) => z.coerce.number().int().min(1).max(50).default(dflt);
+const q = z.string().trim().min(1).max(100).optional();
 
-export const listQuery = foodTypeQuery.extend({
-  q: z.string().trim().min(1).max(100).optional(),
+/** `?page&limit` (TRD §6.1): page ≥ 1, limit 1–50, default 12. */
+export const pageQuery = z.object({ page: z.coerce.number().int().min(1).default(1), limit: limit(12) });
+
+export const listQuery = pageQuery.extend({
+  ...foodTypeQuery.shape,
+  q,
   category: z.string().trim().min(1).optional(),
   dish: z.string().trim().min(1).max(80).optional(),
-  page,
-  limit: limit(12),
 });
+
+export const myListQuery = pageQuery.extend(foodTypeQuery.shape);
+export const adminRecipesQuery = pageQuery.extend({ q });
 
 export const trendingQuery = foodTypeQuery.extend({
   days: z.coerce.number().int().min(1).max(365).default(7),
   limit: limit(10),
+});
+
+export const reviewSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  comment: opt(z.string().trim().max(1000)),
 });

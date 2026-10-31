@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 2 done (Express auth, categories, recipes, uploads, trending). Likes, reviews, admin, the frontend, and FastAPI are not built yet. See `tasks/todo.md` for progress.
+> Status: Phase 3 done. **The Express backend is complete** (all 21 endpoints). The frontend and FastAPI are not built yet. See `tasks/todo.md` for progress.
 
 ## Quick start
 
@@ -27,6 +27,7 @@ MongoDB listens on `mongodb://localhost:27017` (localhost only, no password; loc
 | `backend-express/` | `npm install`, `npm run dev` | Express API on `:5000` (see [its README](backend-express/README.md)) |
 | `backend-express/` | `npm test` / `npm run test:contract` | Unit tests / contract suite against Express |
 | `backend-express/` | `npm run create-admin -- <email> <password> [name]` | Make the first admin |
+| `backend-express/` | `npm run seed` (`-- --reset` to replace data) | Demo data: 6 users, 30 recipes, 100 likes, 50 reviews. All passwords `password123`; admin is `admin@recipebook.test` |
 | `contract-tests/` | `npm install` then `BACKEND=express npm test` | Run the API contract suite against a backend it starts itself |
 | `contract-tests/` | `API_URL=http://localhost:5000/api/v1 npm test` | Run it against a server that is already running |
 
@@ -52,5 +53,5 @@ Specs: [PRD](docs/PRD.md) · [TRD](docs/TRD.md) · [Database schema](docs/DATABA
 
 - **Contract suite** (`contract-tests/`): HTTP tests run against either backend on the test database `recipebook_test`. It is the parity check between the two stacks.
 - **Express unit tests** (`backend-express/test/`): validators, dish-name and regex helpers, model serialisation, and the `create-admin` script (which needs Docker MongoDB).
-- **Index check:** `explain("executionStats")` in mongosh shows `IXSCAN` for the category page, home feed (both `veg`/`nonveg` and Both via `$in`), and search. See `docs/DATABASE_SCHEMA.md` §5–6.
+- **Index check:** `explain("executionStats")` in mongosh shows `IXSCAN` for the category page, home feed (both `veg`/`nonveg` and Both via `$in`), search, trending (`likes_createdAt`), Want to try, reviews, My recipes, and `likedByMe`. See `docs/DATABASE_SCHEMA.md` §5–6.
 - Frontend unit tests and Playwright E2E arrive with their phases.

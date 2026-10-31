@@ -27,3 +27,14 @@ export function uploadImage(buffer) {
       .end(buffer);
   });
 }
+
+/**
+ * Deletes images from Cloudinary. Failures are logged, not thrown: the recipe is already gone,
+ * so an orphaned image is the worst case (ADR-0005). No-op with CLOUDINARY_FAKE=1.
+ * @param {string[]} publicIds
+ */
+export async function deleteImages(publicIds) {
+  if (env.CLOUDINARY_FAKE || !publicIds.length) return;
+  const results = await Promise.allSettled(publicIds.map((id) => cloudinary.uploader.destroy(id)));
+  results.forEach((r, i) => r.status === 'rejected' && console.error(`Cloudinary delete failed for ${publicIds[i]}:`, r.reason));
+}

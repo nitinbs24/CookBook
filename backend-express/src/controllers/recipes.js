@@ -20,3 +20,8 @@ export async function create(req, res) {
 export async function update(req, res) {
   res.json(await recipeService.updateRecipe(req.params.id, recipeSchema.parse(req.body), req.user));
 }
+
+export async function remove(req, res) {
+  await recipeService.deleteRecipe(req.params.id, req.user);
+  res.status(204).end();
+}

@@ -95,3 +95,18 @@ export async function insertLikes(entries) {
 }
 
 export const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
+
+/** Registers a user and promotes them to admin directly in the DB (the API never creates admins). */
+export async function registerAdmin(overrides = {}) {
+  const admin = await registerUser({ name: 'Site Admin', ...overrides });
+  const db = await testDb();
+  await db.collection('users').updateOne({ _id: new ObjectId(admin.user.id) }, { $set: { role: 'admin' } });
+  return { ...admin, user: { ...admin.user, role: 'admin' } };
+}
+
+/** Creates a recipe through the API and returns its full JSON. */
+export async function createRecipe(token, overrides = {}) {
+  const res = await api('POST', '/recipes', { token, body: recipeBody(overrides) });
+  if (res.status !== 201) throw new Error(`create recipe failed: ${res.status} ${JSON.stringify(res.body)}`);
+  return res.body;
+}
