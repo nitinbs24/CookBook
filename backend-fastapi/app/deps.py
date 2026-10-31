@@ -18,6 +18,11 @@ async def _user_from_header(authorization: str | None) -> User | None:
     return await User.get(PydanticObjectId(sub))  # role always comes from the DB, not the token
 
 
+async def get_optional_user(authorization: str | None = Header(default=None)) -> User | None:
+    """The logged-in user, or None: a missing or bad token means "guest", never an error."""
+    return await _user_from_header(authorization)
+
+
 async def get_current_user(authorization: str | None = Header(default=None)) -> User:
     """The logged-in user, or 401."""
     user = await _user_from_header(authorization)

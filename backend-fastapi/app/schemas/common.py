@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, PlainSerializer
 from pydantic.alias_generators import to_camel
@@ -18,3 +18,15 @@ class CamelModel(BaseModel):
     """Request/response base: camelCase on the wire, snake_case in Python."""
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+
+T = TypeVar("T")
+
+
+class Page(CamelModel, Generic[T]):
+    """`{ items, page, limit, total }` (TRD §6.1)."""
+
+    items: list[T]
+    page: int
+    limit: int
+    total: int

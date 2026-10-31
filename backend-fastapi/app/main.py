@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.db import init_db
 from app.core.errors import register_error_handlers
-from app.routers import auth, categories
+from app.routers import auth, categories, recipes, uploads
 
 
 @asynccontextmanager
@@ -24,4 +24,6 @@ app.add_middleware(CORSMiddleware, allow_origins=[settings.cors_origin], allow_m
 api = APIRouter(prefix="/api/v1")
 api.include_router(auth.router)
 api.include_router(categories.router)
+api.include_router(recipes.router)
+api.include_router(uploads.router)
 app.include_router(api)

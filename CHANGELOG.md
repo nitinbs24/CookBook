@@ -2,6 +2,26 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 8] - 2026-10-31
+### Added
+- FastAPI recipes, ported from the Express services:
+  - `POST /uploads` (`UploadFile`: type checked, reads at most 5 MB + 1 byte, Cloudinary through a threadpool, or fake with `CLOUDINARY_FAKE=1`)
+  - `POST /recipes`, `PUT /recipes/{id}` (author only), and `GET /recipes/{id}` with `likedByMe` (`get_optional_user`)
+  - `GET /recipes` (filters, escaped case-insensitive dish match, `$text` search, "Both" as `$in`, pagination)
+  - `GET /recipes/trending`
+- `RecipeIn` mirrors the zod rules: strict integers, null-filled optionals, the dish name normaliser, and `https` + `recipebook/` images. Card, full, detail, and trending response schemas, a generic `Page[T]`, and a `Like` document.
+- Dependencies: `python-multipart`, `cloudinary` (TRD §3).
+- 18 pytest tests for the recipe schema (38 in total).
+### Changed
+- From the ponytail review: `PUT /recipes/{id}` uses `$set` on the editable fields only. Beanie's `save()` replaced the whole document, so a like or review landing mid-edit would have been overwritten in the counters. Ingredient `quantity` is strict (rejects `"1.5"` strings, like zod). Admin-only card pieces are removed until Phase 9 uses them.
+### Verified
+- Contract `uploads`, `recipes`, `recipes-list`, `trending`, and `categories` (59) pass on FastAPI, unchanged. The full suite on FastAPI is 84/124, and every failure is a Phase 9 endpoint. Express is still 124/124.
+- Cross-backend, on one database:
+  - the same recipe created through each backend gives identical POST responses and identically shaped stored documents (keys, types, nulls, no embedded `_id`)
+  - `GET /recipes/:id` is identical from both backends for a recipe made by either
+  - each backend can edit the other's recipes, and dish-filtered lists match
+- One real Cloudinary upload through FastAPI, then deleted.
+
 ## [Phase 7] - 2026-10-31
 ### Added
 - `backend-fastapi/` (Python 3.12, FastAPI 0.162, Beanie 2.2 on PyMongo 4.19 async):

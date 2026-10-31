@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     mongodb_uri: str
     jwt_secret: str = Field(min_length=32)
     cors_origin: str
+    cloudinary_fake: bool = False  # 1 = fake uploads, no network (ADR-0005); the contract tests set it
+    cloudinary_cloud_name: str | None = None
+    cloudinary_api_key: str | None = None
+    cloudinary_api_secret: str | None = None
 
 
 settings = Settings()

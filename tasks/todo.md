@@ -61,8 +61,9 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] **Gate:** green on FastAPI; camelCase confirmed in the DB for users (recipes in Phase 8); an Express token works on FastAPI and users log in across backends; ponytail review fixes applied
 
 ## Phase 8: FastAPI recipes
-- [ ] Uploads, recipe CRUD, lists and filters, trending
-- [ ] **Gate:** contract recipes / uploads / trending / categories green on `:8000`
+- [x] Uploads, recipe CRUD, lists and filters, trending, optional user, `Like` document
+- [x] pytest: recipe schema (18; 38 total)
+- [x] **Gate:** contract recipes / uploads / trending / categories / recipes-list green on FastAPI (59); cross-backend response and stored-document parity verified; real upload checked; ponytail review fixes applied
 
 ## Phase 9: FastAPI likes, reviews, me, admin, seed (Python complete)
 - [ ] Remaining endpoints, cascade, `seed.py`

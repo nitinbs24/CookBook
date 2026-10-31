@@ -4,7 +4,7 @@ A multi-user recipe sharing app. Users post recipes with step-by-step instructio
 
 It is built to demonstrate MongoDB (embedded arrays, references with `$lookup`, aggregation pipelines, text and compound indexes, schema validation) on **two interchangeable backends**: Express + Mongoose and FastAPI + Beanie, behind one React frontend.
 
-> Status: Phase 7 done. The MERN stack is complete. The FastAPI backend serves auth and categories and passes those contract tests; recipes, likes, reviews, and admin come in Phases 8–9. See `tasks/todo.md` for progress.
+> Status: Phase 8 done. The MERN stack is complete. The FastAPI backend serves auth, categories, uploads, recipes (create / read / edit, lists, search, trending) and passes those contract tests (84 of 124); likes, reviews, my lists, admin, and delete come in Phase 9. See `tasks/todo.md` for progress.
 
 ## Quick start
 
