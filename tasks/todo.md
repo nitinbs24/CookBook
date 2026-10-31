@@ -73,4 +73,4 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - [x] Loading, empty, and error states checked in a browser (single page-level error on Home, tile and form skeletons); final README; screenshots
 - [x] `/ponytail-debt`: 5 shortcuts, all with triggers, listed in README Known limits
 - [x] **Gate:** fresh-clone dry run following the README, every suite green on both backends; ponytail review fixes applied
-- [ ] Owner action: re-enter the three Cloudinary values in the root `.env` (lost in the Phase 10 incident; see CHANGELOG)
+- [x] Owner action: re-enter the three Cloudinary values in the root `.env` (done; Cloudinary ping returns ok)
