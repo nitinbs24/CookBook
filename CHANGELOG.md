@@ -2,6 +2,25 @@
 
 All notable changes, one entry per build phase.
 
+## [Phase 5] - 2026-10-31
+### Added
+- Home: Trending this week (a scroll strip with buttons), category tiles with counts (hidden at 0 by the API), and latest recipes with a debounced search (`?q`) and pagination (`?page`). Every list refetches when the veg / non-veg toggle changes.
+- Category page `/category/:slug`: breadcrumb, count, a dish filter chip from `?dish` (clearable), and a paginated card grid.
+- Recipe page `/recipes/:id`: gallery with thumbnails, VegMark and category chip, stats, ingredients (sticky), sectioned steps with durations and tips, an optimistic LikeButton that reverts with a toast on failure, reviews (star radio group, comment, "You reviewed this", delete by the reviewer or an admin), delete recipe for the author or an admin, and a "Recipe not found" page.
+- Shared pieces: native `<dialog>` (`Dialog`, `ConfirmDialog`, `GuestPrompt` for PRD F-5), `ToastProvider`, `useAsync`, `RecipeCard` (stretched link with a separate dish link, so there are no nested anchors), `VegMark`, `Rating`, `CategoryTile`, `Pagination`, empty / error / skeleton states.
+- 60 component tests (25 new).
+### Changed
+- Seed photos now come from TheMealDB (real dishes, with a vegetarian photo for veg recipes in mixed categories) instead of random picsum.photos images. The seed's "a easy" now reads "an easy".
+- From the ponytail review: the search box follows `?q` on browser Back (the debounce used to re-apply the old search), clicks inside a dialog's padding no longer close it, and pagination stays visible on a page past the end.
+- RecipeCard puts the author on its own line, and VegMark never wraps (found in a headless-browser screenshot review).
+### Verified
+- A Playwright run in headless Chromium against Express and the seed data covered PRD flows 2, 3, and 5:
+  - guest browse, reload, the veg toggle hiding Chicken, search, dark mode, category, dish filter, and the recipe page
+  - the guest like prompt and closing it with Escape
+  - login, like and unlike, posting and deleting a review with the rating recomputed, author-only controls, and the not-found page
+- No console errors, no 5xx responses. Every test change was undone.
+- Not built yet: the Edit button (Phase 6, with the form).
+
 ## [Phase 4] - 2026-10-31
 ### Fixed
 - The Vite dev server binds `127.0.0.1`. Its default `localhost` bound only IPv6 `[::1]`, so IPv4-first browsers reported "page can't be reached".

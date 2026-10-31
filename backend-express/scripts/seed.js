@@ -18,7 +18,7 @@ const DAY = 24 * 60 * 60 * 1000;
 // Deterministic pseudo-random numbers, so every seed run produces the same data.
 let state = 42;
 const rand = () => ((state = (state * 1103515245 + 12345) % 2 ** 31) / 2 ** 31);
-const pick = (list) => list[Math.floor(rand() * list.length)];
+const pick = (list, i) => (i === undefined ? list[Math.floor(rand() * list.length)] : list[i % list.length]);
 
 const USERS = [
   ['Site Admin', 'admin@recipebook.test', 'admin'],
@@ -109,6 +109,17 @@ function recipeContent([title, , category]) {
   };
 }
 
+// Food photos from TheMealDB (themealdb.com), hot-linked; cycled within each category.
+const PHOTO = (file) => `https://www.themealdb.com/images/media/meals/${file}.jpg`;
+const PHOTOS = {
+  paneer: ['xxpqsy1511452222'], chicken: ['qptpvt1487339892', 'wyxwsp1486979827', 'yxsurp1511304301'],
+  egg: ['g373701551450225'], potato: ['1550441882'], mutton: ['vvstvq1487342592'],
+  'fish-seafood': ['r7mcjm1780261264', 'qqlwv91763501559'], 'dal-lentils': ['wuxrtu1483564410', 'sywrsu1511463066'],
+  'rice-biryani': ['xrttsx1487339558', '1550441275'], mushroom: ['0r7y5n1782681336'], 'sweets-desserts': ['vrspxv1511722107'],
+};
+// Veg recipes in a category whose photos show meat or egg get a vegetarian photo instead.
+const VEG_PHOTOS = { 'rice-biryani': ['j8c1d51782772399'] };
+
 const COMMENTS = [
   'Turned out perfect, the family loved it.', 'Great balance of spices.', 'Easy to follow, will make again.',
   'A bit spicy for us, but delicious.', 'Better than the restaurant version!', null, null,
@@ -135,9 +146,9 @@ const recipes = await Recipe.create(
     const createdAt = new Date(now - (30 - i) * DAY);
     return {
       title, dishName, category, foodType, difficulty, prepTimeMin, cookTimeMin, servings,
-      description: `${title}: a ${difficulty} ${foodType === 'veg' ? 'vegetarian' : 'non-vegetarian'} favourite.`,
+      description: `${title}: ${difficulty === 'easy' ? 'an' : 'a'} ${difficulty} ${foodType === 'veg' ? 'vegetarian' : 'non-vegetarian'} favourite.`,
       author: cooks[i % cooks.length]._id,
-      images: [{ url: `https://picsum.photos/seed/recipebook-${i + 1}/800/600`, publicId: `recipebook/seed-${i + 1}` }],
+      images: [{ url: PHOTO(pick(foodType === 'veg' && VEG_PHOTOS[category] ? VEG_PHOTOS[category] : PHOTOS[category], i)), publicId: `recipebook/seed-${i + 1}` }],
       ...recipeContent(row),
       createdAt,
       updatedAt: createdAt,

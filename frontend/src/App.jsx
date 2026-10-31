@@ -1,10 +1,12 @@
 import { Outlet, Route, Routes } from 'react-router';
 import Navbar from './components/Navbar.jsx';
 import { SessionRoute } from './components/RouteGuards.jsx';
+import Category from './pages/Category.jsx';
 import Home from './pages/Home.jsx';
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import NotFound from './pages/NotFound.jsx';
+import RecipeDetail from './pages/RecipeDetail.jsx';
 import Register from './pages/Register.jsx';
 
 function AppLayout() {
@@ -28,6 +30,8 @@ export default function App() {
         <Route element={<SessionRoute />}>
           <Route path="/home" element={<Home />} />
         </Route>
+        <Route path="/category/:slug" element={<Category />} />
+        <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

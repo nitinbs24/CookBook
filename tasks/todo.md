@@ -42,9 +42,11 @@ Rules: test first (red, green, refactor). Each phase ends with its gate, then **
 - Moved to Phase 5: guest prompt dialog and toast (first used by like / review)
 
 ## Phase 5: Frontend browsing and recipe page
-- [ ] Home, Category, RecipeDetail (gallery, ingredients, instructions, like, reviews, owner controls)
-- [ ] RTL tests: cards, VegMark, optimistic like revert, review form, refetch on toggle
-- [ ] **Gate:** tests and build green; PRD flows 2, 3, and 5 manually checked in both themes
+- [x] Home, Category, RecipeDetail (gallery, ingredients, instructions, like, reviews, delete for author/admin)
+- [x] Guest prompt dialog, toast, `useAsync` (moved here from Phase 4)
+- [x] RTL tests: cards, VegMark, optimistic like revert, review form, refetch on toggle, search vs Back, pages (60 total)
+- [x] **Gate:** tests and build green; PRD flows 2, 3, and 5 checked in headless Chromium against seeded Express data, in both themes; ponytail review fixes applied
+- Moved to Phase 6: Edit button on the recipe page (lands with the form)
 
 ## Phase 6: Frontend contribute, lists, admin, E2E (MERN complete)
 - [ ] RecipeForm (create / edit), delete confirm, MyRecipes, WantToTry, Admin

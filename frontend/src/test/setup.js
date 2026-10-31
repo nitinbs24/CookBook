@@ -17,3 +17,12 @@ afterEach(() => {
   document.documentElement.className = '';
   window.__prefersDark = false;
 });
+
+// jsdom has no <dialog> methods; browsers do. Minimal stand-in: open/close and the close event.
+HTMLDialogElement.prototype.showModal ??= function showModal() {
+  this.open = true;
+};
+HTMLDialogElement.prototype.close ??= function close() {
+  this.open = false;
+  this.dispatchEvent(new Event('close'));
+};
